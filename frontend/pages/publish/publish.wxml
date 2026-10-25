@@ -1,2 +1,31 @@
-<!--pages/publish/publish.wxml-->
-<text>pages/publish/publish.wxml</text>
+<view class="container">
+  <textarea
+    class="content-input"
+    placeholder="分享你和宠物的日常..."
+    maxlength="1000"
+    value="{{content}}"
+    bindinput="onContentInput"
+  />
+
+  <view class="image-grid">
+    <block wx:for="{{images}}" wx:key="*this">
+      <view class="image-item">
+        <image src="{{item}}" mode="aspectFill" />
+        <view class="remove-btn" data-index="{{index}}" bindtap="removeImage">×</view>
+      </view>
+    </block>
+    <view wx:if="{{images.length < 9}}" class="add-btn" bindtap="chooseImage">
+      <text class="plus">+</text>
+    </view>
+  </view>
+
+  <button
+    class="submit-btn"
+    type="primary"
+    loading="{{submitting}}"
+    disabled="{{submitting}}"
+    bindtap="submit"
+  >
+    {{submitting ? '发布中...' : '发布'}}
+  </button>
+</view>

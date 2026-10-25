@@ -1,123 +1,93 @@
-const api = require('../../utils/api')
-
-function getCurrentUserId() {
-  const user = wx.getStorageSync('user')
-  return user && user.id ? user.id : null
-}
+const { createPost } = require('../../api/post')
 
 Page({
   data: {
     content: '',
     images: [],
-    pets: [],
-    petIndex: -1,
-    petId: null,
-    submitting: false,
-    userId: null
+    submitting: false
   },
 
-  onLoad() {
-    this.setData({ userId: getCurrentUserId() })
+  onContentInput(e) {
+    this.setData({ content: e.detail.value })
   },
 
-  onShow() {
-    const userId = getCurrentUserId()
-    this.setData({ userId })
-    if (userId) {
-      this.loadPets(userId)
-    }
-  },
-
-  async loadPets(userId) {
-    try {
-      const pets = await api.getPets(userId)
-      this.setData({ pets: pets || [] })
-    } catch (error) {
-      // 请求层已统一提示错误
-    }
-  },
-
-  onContentInput(event) {
-    this.setData({ content: event.detail.value })
-  },
-
-  onPetChange(event) {
-    const petIndex = Number(event.detail.value)
-    const pet = this.data.pets[petIndex]
-    this.setData({
-      petIndex,
-      petId: pet ? pet.id : null
-    })
-  },
-
-  chooseImages() {
-    const remain = 9 - this.data.images.length
-    if (remain <= 0) {
-      wx.showToast({ title: '最多选择 9 张图片', icon: 'none' })
-      return
-    }
-
+  chooseImage() {
+    const left = 9 - this.data.images.length
+    if (left <= 0) return
     wx.chooseMedia({
-      count: remain,
+      count: left,
       mediaType: ['image'],
-      sourceType: ['album', 'camera'],
-      success: (result) => {
-        const paths = (result.tempFiles || []).map((file) => file.tempFilePath)
+      success: (res) => {
+        const paths = res.tempFiles.map(f => f.tempFilePath)
         this.setData({ images: this.data.images.concat(paths) })
       }
     })
   },
 
-  removeImage(event) {
-    const index = Number(event.currentTarget.dataset.index)
+  removeImage(e) {
+    const index = e.currentTarget.dataset.index
     const images = this.data.images.slice()
     images.splice(index, 1)
     this.setData({ images })
   },
 
-  previewImage(event) {
-    const current = event.currentTarget.dataset.url
-    wx.previewImage({ current, urls: this.data.images })
-  },
-
   async submit() {
-    if (this.data.submitting) {
-      return
-    }
+    if (this.data.submitting) return
 
-    const userId = this.data.userId || getCurrentUserId()
-    if (!userId) {
-      wx.showToast({ title: '请先登录', icon: 'none' })
-      wx.navigateTo({ url: '/pages/login/login' })
-      return
-    }
-
-    const content = this.data.content.trim()
+    const content = (this.data.content || '').trim()
     if (!content && this.data.images.length === 0) {
-      wx.showToast({ title: '请输入内容或选择图片', icon: 'none' })
-      return
+      return wx.showToast({ title: '写点内容或选张图', icon: 'none' })
     }
 
     this.setData({ submitting: true })
+    wx.showLoading({ title: '发布中...' })
+
     try {
-      await api.publishPost({
-        userId,
-        petId: this.data.petId,
+      // 1. 打印当前选中的图片本地路径
+      console.log("当前选中的本地图片:", this.data.images)
+
+      const fileIDs = []
+      for (let i = 0; i < this.data.images.length; i++) {
+        const filePath = this.data.images[i]
+        const cloudPath = `post/${Date.now()}-${i}-${Math.floor(Math.random() * 10000)}.jpg`
+        
+        console.log(`开始上传第 ${i+1} 张图片...`)
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: filePath
+        })
+        
+        console.log("上传成功，获得 fileID:", uploadRes.fileID)
+        fileIDs.push(uploadRes.fileID)
+      }
+
+      console.log("准备发送给后端的图片数组:", fileIDs)
+
+      // 2. 将文字和真实的 fileIDs 发送给后端
+      await createPost({
         content,
-        images: this.data.images
-      })
-      wx.showToast({ title: '发布成功', icon: 'success' })
-      this.setData({
-        content: '',
-        images: [],
-        petIndex: -1,
+        images: fileIDs, // 这里一定要确保传的是 fileIDs
         petId: null
       })
+
+      wx.showToast({ title: '发布成功', icon: 'success' })
+      
+      // 延迟切回首页
       setTimeout(() => {
         wx.switchTab({ url: '/pages/index/index' })
       }, 600)
-    } catch (error) {
-      // 请求层已统一提示错误
+      
+      const pages = getCurrentPages()
+      const prev = pages[pages.length - 2]
+      if (prev && prev.refreshFeed) {
+        prev.refreshFeed()
+      }
+      
+      setTimeout(() => wx.navigateBack(), 600)
+    } catch (e) {
+      wx.hideLoading()
+      console.error("发布失败:", e)
+      wx.showToast({ title: '发布失败，看控制台', icon: 'none' })
     } finally {
       this.setData({ submitting: false })
     }
