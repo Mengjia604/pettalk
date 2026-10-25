@@ -5,8 +5,8 @@
     "pages/login/login",
     "pages/publish/publish",
     "pages/profile/profile",
-    "pages/pet-edit/pet-edit"
-
+    "pages/pet-edit/pet-edit",
+    "pages/detail/detail"
   ],
   "window": {
     "navigationBarTextStyle": "black",
