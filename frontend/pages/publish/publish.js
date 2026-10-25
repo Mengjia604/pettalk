@@ -1,66 +1,125 @@
-// pages/publish/publish.js
+const api = require('../../utils/api')
+
+function getCurrentUserId() {
+  const user = wx.getStorageSync('user')
+  return user && user.id ? user.id : null
+}
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    content: '',
+    images: [],
+    pets: [],
+    petIndex: -1,
+    petId: null,
+    submitting: false,
+    userId: null
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
+  onLoad() {
+    this.setData({ userId: getCurrentUserId() })
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {
-
+    const userId = getCurrentUserId()
+    this.setData({ userId })
+    if (userId) {
+      this.loadPets(userId)
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
+  async loadPets(userId) {
+    try {
+      const pets = await api.getPets(userId)
+      this.setData({ pets: pets || [] })
+    } catch (error) {
+      // 请求层已统一提示错误
+    }
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
+  onContentInput(event) {
+    this.setData({ content: event.detail.value })
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
+  onPetChange(event) {
+    const petIndex = Number(event.detail.value)
+    const pet = this.data.pets[petIndex]
+    this.setData({
+      petIndex,
+      petId: pet ? pet.id : null
+    })
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
+  chooseImages() {
+    const remain = 9 - this.data.images.length
+    if (remain <= 0) {
+      wx.showToast({ title: '最多选择 9 张图片', icon: 'none' })
+      return
+    }
 
+    wx.chooseMedia({
+      count: remain,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (result) => {
+        const paths = (result.tempFiles || []).map((file) => file.tempFilePath)
+        this.setData({ images: this.data.images.concat(paths) })
+      }
+    })
   },
 
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
+  removeImage(event) {
+    const index = Number(event.currentTarget.dataset.index)
+    const images = this.data.images.slice()
+    images.splice(index, 1)
+    this.setData({ images })
+  },
 
+  previewImage(event) {
+    const current = event.currentTarget.dataset.url
+    wx.previewImage({ current, urls: this.data.images })
+  },
+
+  async submit() {
+    if (this.data.submitting) {
+      return
+    }
+
+    const userId = this.data.userId || getCurrentUserId()
+    if (!userId) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      wx.navigateTo({ url: '/pages/login/login' })
+      return
+    }
+
+    const content = this.data.content.trim()
+    if (!content && this.data.images.length === 0) {
+      wx.showToast({ title: '请输入内容或选择图片', icon: 'none' })
+      return
+    }
+
+    this.setData({ submitting: true })
+    try {
+      await api.publishPost({
+        userId,
+        petId: this.data.petId,
+        content,
+        images: this.data.images
+      })
+      wx.showToast({ title: '发布成功', icon: 'success' })
+      this.setData({
+        content: '',
+        images: [],
+        petIndex: -1,
+        petId: null
+      })
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/index/index' })
+      }, 600)
+    } catch (error) {
+      // 请求层已统一提示错误
+    } finally {
+      this.setData({ submitting: false })
+    }
   }
 })

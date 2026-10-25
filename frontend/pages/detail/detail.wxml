@@ -1,0 +1,52 @@
+<view class="detail-page">
+  <view wx:if="{{post}}" class="post">
+    <view class="author" bindtap="goProfile">
+      <image wx:if="{{post.avatar}}" class="avatar" src="{{post.avatar}}" mode="aspectFill"></image>
+      <text class="nickname">{{post.nickname || '用户' + post.userId}}</text>
+      <button wx:if="{{!isSelf}}" class="follow-button" size="mini" catchtap="toggleFollow">
+        {{post.following ? '已关注' : '关注'}}
+      </button>
+    </view>
+
+    <text wx:if="{{post.content}}" class="content">{{post.content}}</text>
+
+    <view wx:if="{{post.images && post.images.length}}" class="images">
+      <image
+        wx:for="{{post.images}}"
+        wx:key="*this"
+        class="post-image"
+        src="{{item}}"
+        mode="aspectFill"
+        data-url="{{item}}"
+        bindtap="previewImage"
+      ></image>
+    </view>
+
+    <view class="post-meta">
+      <text>{{post.createTime}}</text>
+      <text bindtap="toggleLike">{{post.liked ? '取消点赞' : '点赞'}} {{post.likeCount || 0}}</text>
+      <text>评论 {{post.commentCount || 0}}</text>
+    </view>
+  </view>
+
+  <view class="comments">
+    <view wx:for="{{comments}}" wx:key="id" class="comment">
+      <image wx:if="{{item.avatar}}" class="comment-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+      <view class="comment-body">
+        <text class="comment-nickname">{{item.nickname || '用户'}}</text>
+        <text class="comment-content">{{item.content}}</text>
+      </view>
+    </view>
+    <text wx:if="{{!comments.length}}" class="empty">暂无评论</text>
+  </view>
+
+  <view class="comment-bar">
+    <input
+      class="comment-input"
+      value="{{commentContent}}"
+      placeholder="写评论..."
+      bindinput="onCommentInput"
+    />
+    <button size="mini" loading="{{submitting}}" bindtap="submitComment">发送</button>
+  </view>
+</view>
