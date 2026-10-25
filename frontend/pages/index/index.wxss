@@ -1,10 +1,111 @@
-/**index.wxss**/
-page {
-  height: 100vh;
+.feed {
+  padding: 20rpx 24rpx;
+  background: #F4F6F8; /* 更柔和的灰底 */
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+/* 卡片质感：圆角、阴影、留白 */
+.post-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04); /* 极其细腻的阴影 */
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+/* 头像优化：加个渐变背景或细边框 */
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); /* 清新的渐变蓝绿 */
+  color: #fff;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-right: 20rpx;
+}
+
+.user-info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
-.scrollarea {
-  flex: 1;
-  overflow-y: hidden;
+
+.nickname {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.time {
+  font-size: 22rpx;
+  color: #B0B0B0;
+  margin-top: 6rpx;
+}
+
+/* 正文排版：增加行高，阅读更舒适 */
+.post-content {
+  font-size: 30rpx;
+  line-height: 1.7;
+  color: #333;
+  margin-bottom: 20rpx;
+  word-break: break-all;
+}
+
+/* 九宫格图片：圆角稍微大一点 */
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx; /* 用 gap 替代 margin 让间距更均匀 */
+  margin-bottom: 20rpx;
+}
+
+.grid-image {
+  /* 直接指定固定的宽和高，计算好比例，保证是正方形 */
+  width: 206rpx;
+  height: 206rpx;
+  border-radius: 12rpx;
+  background: #f0f0f0;
+  object-fit: cover; /* 这个很关键，保证图片填满正方形且不变形 */
+  flex-shrink: 0; /* 防止被挤压 */
+}
+
+/* 底部操作区：加上顶部分割线 */
+.post-footer {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 26rpx;
+  color: #888;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.stat {
+  margin-left: 40rpx;
+  display: flex;
+  align-items: center;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 120rpx 0;
+  font-size: 28rpx;
+}
+
+.loading,
+.no-more {
+  text-align: center;
+  color: #B0B0B0;
+  padding: 30rpx 0;
+  font-size: 24rpx;
 }

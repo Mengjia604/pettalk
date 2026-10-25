@@ -1,7 +1,39 @@
-<!--index.wxml-->
-<navigation-bar title="Weixin" back="{{false}}" color="black" background="#FFF"></navigation-bar>
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    Weixin
+<view class="feed">
+  <view wx:for="{{list}}" wx:key="id" class="post-card">
+    <view class="post-header">
+      <view class="avatar">{{item.userId}}</view>
+      <view class="user-info">
+        <view class="nickname">用户{{item.userId}}</view>
+        <view class="time">{{item.createdAt}}</view>
+      </view>
+    </view>
+
+    <view class="post-content" wx:if="{{item.content}}">{{item.content}}</view>
+
+    <view class="image-grid" wx:if="{{item.images && item.images.length > 0}}">
+      <image
+        wx:for="{{item.images}}"
+        wx:for-item="img"
+        wx:key="*this"
+        src="{{img}}"
+        mode="aspectFill"
+        data-urls="{{item.images}}"
+        data-current="{{img}}"
+        bindtap="previewImage"
+        class="grid-image"
+      />
+    </view>
+
+    <view class="post-footer">
+      <text class="stat">👍 {{item.likeCount || 0}}</text>
+      <text class="stat">💬 {{item.commentCount || 0}}</text>
+    </view>
   </view>
-</scroll-view>
+
+  <view wx:if="{{list.length === 0 && !loading}}" class="empty">
+    <text>还没有动态，去发布第一条吧～</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+  <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— 没有更多了 —</view>
+</view>
