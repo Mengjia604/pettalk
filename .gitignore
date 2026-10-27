@@ -16,3 +16,12 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local comparison workspace
+_github_compare/
+
+# WeChat local private config
+frontend/project.private.config.json
+
+# Course deliverables
+工程项目管理/

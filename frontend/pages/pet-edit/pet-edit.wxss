@@ -1,1 +1,69 @@
-/* pages/pet-edit/pet-edit.wxss */
+.pet-edit-page {
+  min-height: 100vh;
+  padding: 40rpx 32rpx;
+  box-sizing: border-box;
+  background: #f7f7f7;
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.avatar {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: #eee;
+}
+
+.avatar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 26rpx;
+}
+
+.avatar-button {
+  margin: 0;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  min-height: 96rpx;
+  margin-bottom: 20rpx;
+  padding: 0 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+}
+
+.label {
+  width: 120rpx;
+  color: #333;
+}
+
+.input {
+  flex: 1;
+}
+
+.picker-value {
+  flex: 1;
+  color: #333;
+}
+
+.save-button {
+  margin-top: 48rpx;
+  color: #fff;
+  background: #07c160;
+}
+
+.delete-button {
+  margin-top: 24rpx;
+  color: #e64340;
+  background: #fff;
+}

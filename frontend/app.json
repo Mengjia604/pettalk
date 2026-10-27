@@ -2,6 +2,7 @@
   "entryPagePath": "pages/index/index",
   "pages": [
     "pages/index/index",
+    "pages/detail/detail",
     "pages/login/login",
     "pages/publish/publish",
     "pages/profile/profile",

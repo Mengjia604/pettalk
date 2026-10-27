@@ -1,2 +1,18 @@
 // app.js
-App({})
+App({
+  onLaunch() {
+    if (!wx.cloud) {
+      console.error('请使用 2.2.3 或以上的基础库以使用云能力')
+      return
+    }
+
+    wx.cloud.init({
+      env: 'cloud1-d2g2g1di987d43491',
+      traceUser: true
+    })
+  },
+
+  globalData: {
+    apiBaseUrl: 'http://127.0.0.1:8080'
+  }
+})

@@ -1,12 +1,13 @@
 package com.pettalk.controller;
 
+import com.pettalk.common.Result;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
     @GetMapping("/hello")
-    public String hello() {
-        return "pettalk ok";
+    public Result<String> hello() {
+        return Result.success("pettalk ok");
     }
 }

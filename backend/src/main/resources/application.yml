@@ -1,9 +1,27 @@
 spring:
+  application:
+    name: pettalk
   datasource:
-    url: jdbc:mysql://localhost:3306/pettalk?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai
-    username: root
-    password: your_password
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://localhost:3306/pettalk?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai"
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
 
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto

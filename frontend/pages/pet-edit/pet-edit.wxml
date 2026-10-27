@@ -1,2 +1,52 @@
-<!--pages/pet-edit/pet-edit.wxml-->
-<text>pages/pet-edit/pet-edit.wxml</text>
+<view class="pet-edit-page">
+  <view class="avatar-section">
+    <image
+      wx:if="{{form.avatar}}"
+      class="avatar"
+      src="{{form.avatar}}"
+      mode="aspectFill"
+      bindtap="previewAvatar"
+    ></image>
+    <view wx:else class="avatar avatar-empty" bindtap="chooseAvatar">选择头像</view>
+    <button class="avatar-button" size="mini" bindtap="chooseAvatar">更换头像</button>
+  </view>
+
+  <view class="form-item">
+    <text class="label">昵称</text>
+    <input
+      class="input"
+      value="{{form.name}}"
+      placeholder="请输入宠物昵称"
+      maxlength="50"
+      bindinput="onNameInput"
+    />
+  </view>
+
+  <view class="form-item">
+    <text class="label">品种</text>
+    <input
+      class="input"
+      value="{{form.breed}}"
+      placeholder="请输入宠物品种"
+      maxlength="50"
+      bindinput="onBreedInput"
+    />
+  </view>
+
+  <picker mode="date" value="{{form.birthday}}" end="{{today}}" bindchange="onBirthdayChange">
+    <view class="form-item">
+      <text class="label">生日</text>
+      <text class="picker-value">{{form.birthday || '请选择生日'}}</text>
+    </view>
+  </picker>
+
+  <button class="save-button" loading="{{saving}}" disabled="{{saving}}" bindtap="savePet">
+    {{isEdit ? '保存修改' : '新增宠物'}}
+  </button>
+  <button
+    wx:if="{{isEdit}}"
+    class="delete-button"
+    disabled="{{saving}}"
+    bindtap="deletePet"
+  >删除宠物</button>
+</view>
