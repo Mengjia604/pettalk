@@ -45,4 +45,22 @@ public class UserController {
 
         return Result.success(data);
     }
+    
+    @GetMapping("/user/profile/{targetUserId}")
+public Result<ProfileVO> getUserProfile(@PathVariable Long targetUserId, @RequestParam Long userId) {
+    User user = userService.getById(targetUserId);
+    Long fanCount = followService.lambdaQuery().eq(Follow::getFollowedId, targetUserId).count();
+    Long followCount = followService.lambdaQuery().eq(Follow::getUserId, targetUserId).count();
+    boolean isFollowed = followService.lambdaQuery()
+            .eq(Follow::getUserId, userId)
+            .eq(Follow::getFollowedId, targetUserId).exists();
+
+    ProfileVO vo = new ProfileVO();
+    vo.setUser(user);
+    vo.setFanCount(fanCount);
+    vo.setFollowCount(followCount);
+    vo.setFollowed(isFollowed);
+    return Result.success(vo);
+}
+
 }
