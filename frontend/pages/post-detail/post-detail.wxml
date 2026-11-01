@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="post">
+    <view class="author">{{post.userName}}</view>
+    <view class="content">{{post.content}}</view>
+  </view>
+  <view class="like-bar" bindtap="handleLike">
+    <text wx:if="{{isLiked}}">❤️</text>
+    <text wx:else>🤍</text>
+    <text> {{likeCount}}</text>
+  </view>
+  <view class="comment-title">评论共 {{commentTotal}} 条</view>
+  <view wx:for="{{commentList}}" wx:key="id" class="comment-item">
+    <view>{{item.userName}}：{{item.content}}</view>
+  </view>
+</view>
