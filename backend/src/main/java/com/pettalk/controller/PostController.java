@@ -45,4 +45,23 @@ public class PostController {
             @RequestParam(required = false) Long userId) {
         return Result.success(postService.getDetail(postId, userId));
     }
+    
+    @GetMapping("/post/detail/{postId}")
+public Result<PostDetailVO> getPostDetail(@PathVariable Long postId, @RequestParam Long userId) {
+    Post post = postService.getById(postId);
+    Long likeCount = postLikeService.lambdaQuery()
+            .eq(PostLike::getPostId, postId).count();
+    boolean isLiked = postLikeService.lambdaQuery()
+            .eq(PostLike::getPostId, postId)
+            .eq(PostLike::getUserId, userId).exists();
+    List<CommentVO> commentList = commentService.getCommentByPostId(postId);
+
+    PostDetailVO vo = new PostDetailVO();
+    vo.setPost(post);
+    vo.setLikeCount(likeCount);
+    vo.setLiked(isLiked);
+    vo.setCommentTotal(commentList.size());
+    vo.setCommentList(commentList);
+    return Result.success(vo);
+}
 }
