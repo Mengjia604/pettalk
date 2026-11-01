@@ -7,6 +7,7 @@
     "pages/publish/publish",
     "pages/profile/profile",
     "pages/pet-edit/pet-edit"
+    "pages/post-detail/post-detail"
 
   ],
   "window": {
