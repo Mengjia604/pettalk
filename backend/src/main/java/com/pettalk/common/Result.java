@@ -1,25 +1,46 @@
 package com.pettalk.common;
 
-import lombok.Data;
-
-@Data
 public class Result<T> {
-    private Integer code; // 200成功，500失败
-    private String message;
+    private Integer code;
+    private String msg;
     private T data;
 
     public static <T> Result<T> success(T data) {
-        Result<T> result = new Result<>();
-        result.setCode(200);
-        result.setMessage("success");
-        result.setData(data);
-        return result;
+        Result<T> r = new Result<>();
+        r.code = 200;
+        r.msg = "success";
+        r.data = data;
+        return r;
     }
 
-    public static <T> Result<T> error(String message) {
-        Result<T> result = new Result<>();
-        result.setCode(500);
-        result.setMessage(message);
-        return result;
+    public static <T> Result<T> fail(String msg) {
+        Result<T> r = new Result<>();
+        r.code = 500;
+        r.msg = msg;
+        return r;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 }
