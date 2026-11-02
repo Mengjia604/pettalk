@@ -1,0 +1,47 @@
+<view class="detail-container">
+  <!-- 1. 动态卡片 -->
+  <view class="post-card">
+    <view class="post-header">
+      <view class="avatar">用户{{post.userId}}</view>
+      <view class="user-info">
+        <view class="nickname">用户{{post.userId}}</view>
+        <view class="time">{{post.createdAt}}</view>
+      </view>
+    </view>
+    
+    <view class="post-content" wx:if="{{post.content}}">{{post.content}}</view>
+    
+    <view class="image-grid" wx:if="{{post.images && post.images.length > 0}}">
+      <image
+        wx:for="{{post.images}}"
+        wx:for-item="img"
+        wx:key="*this"
+        src="{{img}}"
+        mode="aspectFill"
+        class="grid-image"
+        bindtap="previewImage"
+        data-urls="{{post.images}}"
+        data-current="{{img}}"
+      />
+    </view>
+    
+    <view class="post-footer">
+      <text class="stat">👍 {{post.likeCount || 0}}</text>
+      <text class="stat">💬 {{post.commentCount || 0}}</text>
+    </view>
+  </view>
+
+  <!-- 2. 评论区壳子 (等3号填数据) -->
+  <view class="comment-section">
+    <view class="comment-title">全部评论</view>
+    <view class="empty-comment" wx:if="{{!comments || comments.length === 0}}">
+      还没有评论，快来抢沙发吧～
+    </view>
+  </view>
+</view>
+
+<!-- 3. 底部评论框 -->
+<view class="bottom-input-bar">
+  <input class="comment-input" placeholder="说点什么..." />
+  <button class="send-btn" size="mini" hover-class="btn-hover">发送</button>
+</view>

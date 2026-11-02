@@ -1,0 +1,99 @@
+.container {
+  padding: 24rpx;
+  background: #fff;
+  min-height: 100vh;
+}
+
+.content-input {
+  width: 100%;
+  height: 240rpx;
+  font-size: 30rpx;
+  line-height: 1.6;
+  padding: 16rpx;
+  box-sizing: border-box;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 24rpx;
+}
+
+.image-item {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.image-item image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 32rpx;
+}
+
+.add-btn {
+  width: 200rpx;
+  height: 200rpx;
+  border: 2rpx dashed #ccc;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+.plus {
+  font-size: 60rpx;
+}
+
+.submit-btn {
+  margin-top: 40rpx;
+}
+
+.cat-deco {
+  position: fixed;
+  right: -30rpx;       /* 根据你的图片大小微调 */
+  bottom: -60rpx;       /* 根据你的图片大小微调 */
+  width: 240rpx;       /* 图片的宽度，自己看着调 */
+  height: 230rpx;      /* 图片的高度 */
+  z-index: 0;          
+  pointer-events: none; 
+}
+
+/* 2. 橘色渐变发布按钮 (覆盖微信默认的绿色) */
+.submit-btn {
+  margin-top: 60rpx;
+  background: linear-gradient(135deg, #ff9a44, #fc6076) !important; /* 橘色渐变 */
+  color: #fff !important;
+  border-radius: 50rpx; /* 圆角更大 */
+  font-size: 34rpx;
+  font-weight: bold;
+  box-shadow: 0 10rpx 20rpx rgba(252, 96, 118, 0.3); /* 橘色发光阴影 */
+  border: none;
+  padding: 10rpx 0;
+}
+
+/* 按钮按下去的回弹效果 */
+.btn-hover {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 10rpx rgba(252, 96, 118, 0.3);
+  opacity: 0.9;
+}

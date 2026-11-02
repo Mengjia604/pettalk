@@ -1,0 +1,137 @@
+page { 
+  background: #f5f5f5; 
+  padding-bottom: 120rpx; 
+}
+
+.detail-container { padding: 16rpx; }
+
+.post-card {
+   background: #fff; 
+   border-radius: 16rpx; 
+   padding: 24rpx; 
+   margin-bottom: 16rpx;
+   }
+.post-header { 
+  display: flex; 
+  align-items: center; 
+  margin-bottom: 16rpx; 
+}
+
+.avatar { 
+  width: 80rpx; 
+  height: 80rpx; 
+  border-radius: 50%; 
+  background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); 
+  color: #fff; 
+  text-align: center; 
+  line-height: 80rpx; 
+  font-size: 28rpx; 
+  margin-right: 16rpx;
+ }
+.nickname {
+  font-size: 30rpx; 
+  font-weight: 600; 
+}
+
+.time { 
+  font-size: 22rpx; 
+  color: #999; 
+  margin-top: 4rpx; 
+}
+
+.post-content { 
+  font-size: 32rpx; 
+  line-height: 1.6; 
+  margin-bottom: 16rpx; 
+}
+
+.image-grid { 
+  display: flex; 
+  flex-wrap: wrap; 
+  margin-bottom: 16rpx; 
+}
+
+.grid-image { 
+  width: 200rpx; 
+  height: 200rpx; 
+  margin-right: 12rpx; 
+  margin-bottom: 12rpx; 
+  border-radius: 8rpx; 
+}
+
+.post-footer { 
+  display: flex; 
+  justify-content: flex-end; 
+  font-size: 26rpx; 
+  color: #666; 
+  border-top: 1rpx solid #eee; 
+  padding-top: 16rpx; 
+}
+
+.stat { margin-left: 32rpx; }
+
+.comment-section { 
+  background: #fff; 
+  border-radius: 16rpx; 
+  padding: 24rpx; 
+  min-height: 400rpx; 
+}
+
+.comment-title { 
+  font-size: 30rpx; 
+  font-weight: 600; 
+  margin-bottom: 20rpx; 
+  border-left: 6rpx solid #4a90e2; 
+  padding-left: 12rpx; 
+}
+
+.empty-comment { 
+  text-align: center; 
+  color: #999; 
+  font-size: 26rpx; 
+  margin-top: 60rpx; 
+}
+
+.bottom-input-bar { 
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  background: #fff; 
+  padding: 16rpx 24rpx; 
+  display: flex; 
+  align-items: center; 
+  border-top: 1rpx solid #eee; 
+}
+
+.comment-input { 
+  flex: 1; 
+  background: #f5f5f5; 
+  border-radius: 32rpx; 
+  padding: 0 24rpx; 
+  height: 70rpx; 
+  font-size: 28rpx; 
+  margin-right: 16rpx; 
+}
+
+.send-btn { 
+  background: linear-gradient(135deg, #ff9a44, #fc6076) !important;
+  color: #fff !important; 
+  border-radius: 40rpx; 
+  margin: 0; 
+  padding: 0 36rpx; 
+  font-size: 28rpx;
+  font-weight: 500;
+  box-shadow: 0 6rpx 16rpx rgba(252, 96, 118, 0.3); 
+  border: none; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 2.2; 
+}
+
+.btn-hover {
+  transform: scale(0.92); 
+  box-shadow: 0 2rpx 8rpx rgba(252, 96, 118, 0.3); 
+  opacity: 0.9;
+}

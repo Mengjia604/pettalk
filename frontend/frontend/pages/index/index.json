@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "宠物圈",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "onReachBottomDistance": 100
+}
