@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PetServiceImpl extends ServiceImpl<PetMapper, Pet> implements PetService {
@@ -35,24 +36,31 @@ public class PetServiceImpl extends ServiceImpl<PetMapper, Pet> implements PetSe
 
     @Override
     @Transactional
-    public Pet addPet(Pet pet) {
-        if (pet.getUserId() == null) {
+    public Pet addPet(Pet pet, Long currentUserId) {
+        if (currentUserId == null) {
             throw new IllegalArgumentException("用户 ID 不能为空");
         }
         if (pet.getName() == null || pet.getName().isBlank()) {
             throw new IllegalArgumentException("宠物昵称不能为空");
         }
         pet.setId(null);
+        pet.setUserId(currentUserId);
+        pet.setName(pet.getName().trim());
+        pet.setCreateTime(null);
         save(pet);
         return getById(pet.getId());
     }
 
     @Override
     @Transactional
-    public Pet updatePet(Long id, Pet pet) {
+    public Pet updatePet(Long id, Pet pet, Long currentUserId) {
         Pet existing = getPetById(id);
+        requireOwner(existing, currentUserId, "无权修改该宠物");
         if (pet.getName() != null && pet.getName().isBlank()) {
             throw new IllegalArgumentException("宠物昵称不能为空");
+        }
+        if (pet.getName() != null) {
+            pet.setName(pet.getName().trim());
         }
         pet.setId(id);
         pet.setUserId(existing.getUserId());
@@ -63,8 +71,15 @@ public class PetServiceImpl extends ServiceImpl<PetMapper, Pet> implements PetSe
 
     @Override
     @Transactional
-    public void deletePet(Long id) {
-        getPetById(id);
+    public void deletePet(Long id, Long currentUserId) {
+        Pet existing = getPetById(id);
+        requireOwner(existing, currentUserId, "无权删除该宠物");
         removeById(id);
+    }
+
+    private void requireOwner(Pet pet, Long currentUserId, String message) {
+        if (currentUserId == null || !Objects.equals(pet.getUserId(), currentUserId)) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }

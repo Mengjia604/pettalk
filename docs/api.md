@@ -5,7 +5,8 @@
 - 基础地址：`http://127.0.0.1:8080`
 - 请求体：`application/json`
 - 分页参数：`page` 默认 `1`，`size` 默认 `10`，`size` 最大 `50`
-- 当前未接入正式鉴权，用户身份通过 `userId`、`followerId` 等参数传入
+- 鉴权：新增、修改、删除等写操作需要 `Authorization: Bearer <JWT>`；浏览类 GET 接口游客可访问
+- 登录用户 ID 以 JWT 为准，写接口中的 `userId` 字段仅保留兼容，服务端不再信任请求体中的用户 ID
 - 所有业务接口统一返回 `Result`：
 
 ```json
@@ -16,20 +17,28 @@
 }
 ```
 
-`code = 200` 表示成功，`code = 500` 表示业务或服务器错误。HTTP 状态码当前仍可能为 200，前端以 `body.code` 判断结果。
+`code = 200` 表示成功，`code = 500` 表示业务或服务器错误，`code = 401` 表示未登录或登录已失效。鉴权失败时 HTTP 状态码为 401，其余业务错误 HTTP 状态码仍为 200，前端以 `body.code` 判断结果。
+
+本地启动需要配置以下环境变量：
+
+| 变量 | 说明 |
+| --- | --- |
+| `DB_USERNAME` / `DB_PASSWORD` | MySQL 用户名和密码 |
+| `WECHAT_APP_ID` / `WECHAT_APP_SECRET` | 小程序 AppID 和 AppSecret |
+| `WECHAT_MOCK_ENABLED` | 本地联调时设为 `true`，可用 `mock_` 开头的 code 登录 |
+| `JWT_SECRET` | JWT 签名密钥，至少 32 字节；生产环境必须替换默认值 |
 
 ## 2. 登录
 
 ### POST /auth/login
 
-模拟微信登录。当前不校验微信 `code`，使用 `openid` 识别用户。
+使用 `wx.login` 返回的临时 `code` 调用微信 `code2session`，获取 `openid` 后自动注册或查询用户，并签发 JWT。
 
 请求体：
 
 ```json
 {
-  "openid": "test_openid_123",
-  "code": "wx.login 返回的临时 code（可选，当前后端预留）"
+  "code": "wx.login 返回的临时 code"
 }
 ```
 
@@ -37,7 +46,7 @@
 
 ```json
 {
-  "token": "mock_token_1",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": 1,
     "openid": "test_openid_123",
@@ -49,7 +58,7 @@
 }
 ```
 
-当前后端仍以 `openid` 识别用户，`code` 字段为后续接入微信 `code2session` 预留。
+JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有 AppSecret 时，设置 `WECHAT_MOCK_ENABLED=true`，请求体使用 `{"code":"mock_test_openid_123"}` 即可联调；此时 `mock_` 后的内容作为 openid。
 
 ## 3. 个人主页
 
@@ -96,15 +105,15 @@
 
 ### GET /pet/{userId}
 
-查询指定用户的宠物列表。
+查询指定用户的宠物列表，游客可访问。
 
 ### GET /pet/detail/{id}
 
-查询宠物详情。
+查询宠物详情，游客可访问。
 
 ### POST /pet
 
-新增宠物。
+新增宠物，需要 JWT。`userId` 可省略，服务端以 JWT 中的用户为准。
 
 ```json
 {
@@ -118,11 +127,13 @@
 
 ### PUT /pet/{id}
 
-更新宠物，字段同新增宠物。
+更新宠物，需要 JWT，且只能修改自己的宠物。字段同新增宠物。
 
 ### DELETE /pet/{id}
 
-删除宠物。
+删除宠物，需要 JWT，且只能删除自己的宠物。
+
+宠物头像由前端先上传到 CloudBase，再将返回的 `fileID` 保存到 `avatar` 字段；展示时通过 `getTempUrls` 换取临时链接。
 
 ## 5. 动态
 
@@ -282,6 +293,7 @@
 ## 9. 图片云存储
 
 - 发布页选择图片后，先调用 `wx.cloud.uploadFile` 上传到 CloudBase，保存返回的 `fileID`。
+- 宠物头像同样上传到 `pet/avatar/` 目录，宠物表只保存 `fileID`。
 - 首页、动态详情和个人主页展示图片前，调用 `getTempUrls` 云函数批量换取临时 URL。
 - CloudBase 环境：`cloud1-d2g2g1di987d43491`。
 - 部署前需在微信开发者工具中上传并部署 `frontend/cloudfunctions/getTempUrls`，否则云图片无法正常显示。

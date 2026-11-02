@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const { resolveCloudImages, uploadPetAvatar } = require('../../utils/cloud')
 
 function getCurrentUser() {
   try {
@@ -32,6 +33,8 @@ Page({
     isEdit: false,
     saving: false,
     today: todayString(),
+    avatarUrl: '',
+    avatarFile: '',
     form: emptyForm()
   },
 
@@ -79,7 +82,10 @@ Page({
         return
       }
 
+      const [avatarUrl] = await resolveCloudImages(pet.avatar ? [pet.avatar] : [])
       this.setData({
+        avatarUrl: avatarUrl || '',
+        avatarFile: '',
         form: {
           name: pet.name || '',
           breed: pet.breed || '',
@@ -112,19 +118,23 @@ Page({
       success: (result) => {
         const file = (result.tempFiles || [])[0]
         if (file) {
-          this.setData({ 'form.avatar': file.tempFilePath })
+          this.setData({
+            'form.avatar': file.tempFilePath,
+            avatarUrl: file.tempFilePath,
+            avatarFile: file.tempFilePath
+          })
         }
       }
     })
   },
 
   previewAvatar() {
-    if (!this.data.form.avatar) {
+    if (!this.data.avatarUrl) {
       return
     }
     wx.previewImage({
-      current: this.data.form.avatar,
-      urls: [this.data.form.avatar]
+      current: this.data.avatarUrl,
+      urls: [this.data.avatarUrl]
     })
   },
 
@@ -139,16 +149,26 @@ Page({
       return
     }
 
-    const payload = {
-      userId: this.data.userId,
-      name,
-      breed: (this.data.form.breed || '').trim(),
-      birthday: this.data.form.birthday || null,
-      avatar: this.data.form.avatar || null
-    }
-
     this.setData({ saving: true })
     try {
+      let avatar = this.data.form.avatar || null
+      if (this.data.avatarFile) {
+        try {
+          avatar = await uploadPetAvatar(this.data.avatarFile)
+        } catch (error) {
+          wx.showToast({ title: error.message || '头像上传失败', icon: 'none' })
+          return
+        }
+      }
+
+      const payload = {
+        userId: this.data.userId,
+        name,
+        breed: (this.data.form.breed || '').trim(),
+        birthday: this.data.form.birthday || null,
+        avatar
+      }
+
       if (this.data.isEdit) {
         await api.updatePet(this.data.petId, payload)
       } else {

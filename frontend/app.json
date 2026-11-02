@@ -10,7 +10,7 @@
 
   ],
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarBackgroundColor": "#000000",
     "navigationBarTitleText": "PetTalk",
     "backgroundColor": "#000",
@@ -35,17 +35,6 @@
     ]
   },
   "style": "v2",
-  "renderer": "skyline",
-  "rendererOptions": {
-    "skyline": {
-      "defaultDisplayBlock": true,
-      "defaultContentBox": true,
-      "tagNameStyleIsolation": "legacy",
-      "disableABTest": true,
-      "sdkVersionBegin": "3.0.0",
-      "sdkVersionEnd": "15.255.255"
-    }
-  },
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

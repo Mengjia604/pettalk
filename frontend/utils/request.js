@@ -30,6 +30,15 @@ function getStorageValue(key) {
   }
 }
 
+function clearSession() {
+  try {
+    wx.removeStorageSync('token')
+    wx.removeStorageSync('user')
+  } catch (error) {
+    // 清理失败时不影响后续提示
+  }
+}
+
 function request(options = {}) {
   const {
     url,
@@ -99,12 +108,19 @@ function request(options = {}) {
       success(response) {
         finishLoading()
 
-        if (response.statusCode < 200 || response.statusCode >= 300) {
-          fail(`请求失败（${response.statusCode}）`)
+        const body = response.data
+
+        if (response.statusCode === 401 || (body && body.code === 401)) {
+          clearSession()
+          fail((body && body.message) || '登录已失效，请重新登录')
           return
         }
 
-        const body = response.data
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          fail((body && body.message) || `请求失败（${response.statusCode}）`)
+          return
+        }
+
         if (!body || typeof body !== 'object') {
           fail('接口返回格式错误')
           return

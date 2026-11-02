@@ -51,7 +51,27 @@ async function uploadPostImage(filePath, index = 0) {
   return result.fileID
 }
 
+async function uploadPetAvatar(filePath) {
+  if (!wx.cloud) {
+    throw new Error('当前基础库不支持云开发')
+  }
+
+  const matched = filePath.match(/\.[a-zA-Z0-9]+$/)
+  const extension = matched ? matched[0] : '.jpg'
+  const cloudPath = `pet/avatar/${Date.now()}-${Math.floor(Math.random() * 10000)}${extension}`
+  const result = await wx.cloud.uploadFile({
+    cloudPath,
+    filePath
+  })
+
+  if (!result.fileID) {
+    throw new Error('头像上传失败')
+  }
+  return result.fileID
+}
+
 module.exports = {
   resolveCloudImages,
-  uploadPostImage
+  uploadPostImage,
+  uploadPetAvatar
 }

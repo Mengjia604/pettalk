@@ -31,20 +31,24 @@ public class PetController {
 
     // 新增宠物
     @PostMapping
-    public Result<Pet> addPet(@RequestBody Pet pet) {
-        return Result.success(petService.addPet(pet));
+    public Result<Pet> addPet(@RequestBody Pet pet,
+                              @RequestAttribute("currentUserId") Long currentUserId) {
+        return Result.success(petService.addPet(pet, currentUserId));
     }
 
     // 更新宠物
     @PutMapping("/{id}")
-    public Result<Pet> updatePet(@PathVariable Long id, @RequestBody Pet pet) {
-        return Result.success(petService.updatePet(id, pet));
+    public Result<Pet> updatePet(@PathVariable Long id,
+                                 @RequestBody Pet pet,
+                                 @RequestAttribute("currentUserId") Long currentUserId) {
+        return Result.success(petService.updatePet(id, pet, currentUserId));
     }
 
     // 删除宠物
     @DeleteMapping("/{id}")
-    public Result<String> deletePet(@PathVariable Long id) {
-        petService.deletePet(id);
+    public Result<String> deletePet(@PathVariable Long id,
+                                    @RequestAttribute("currentUserId") Long currentUserId) {
+        petService.deletePet(id, currentUserId);
         return Result.success("删除成功");
     }
 }

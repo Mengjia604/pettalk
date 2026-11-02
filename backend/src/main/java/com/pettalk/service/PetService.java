@@ -11,9 +11,9 @@ public interface PetService extends IService<Pet> {
 
     Pet getPetById(Long id);
 
-    Pet addPet(Pet pet);
+    Pet addPet(Pet pet, Long currentUserId);
 
-    Pet updatePet(Long id, Pet pet);
+    Pet updatePet(Long id, Pet pet, Long currentUserId);
 
-    void deletePet(Long id);
+    void deletePet(Long id, Long currentUserId);
 }

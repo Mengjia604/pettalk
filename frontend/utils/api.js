@@ -9,15 +9,11 @@ function buildQuery(params) {
   return query ? `?${query}` : ''
 }
 
-function login(openid, code) {
-  const data = { openid }
-  if (code) {
-    data.code = code
-  }
+function login(code) {
   return request({
     url: '/auth/login',
     method: 'POST',
-    data,
+    data: { code },
     auth: false
   })
 }

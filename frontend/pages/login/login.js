@@ -10,19 +10,6 @@ function getStoredSession() {
   }
 }
 
-function getMockOpenid() {
-  try {
-    let openid = wx.getStorageSync('mockOpenid')
-    if (!openid) {
-      openid = `mock_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-      wx.setStorageSync('mockOpenid', openid)
-    }
-    return openid
-  } catch (error) {
-    return 'test_openid_123'
-  }
-}
-
 Page({
   data: {
     loading: false
@@ -40,7 +27,6 @@ Page({
     }
 
     this.setData({ loading: true })
-    const openid = getMockOpenid()
     let code = ''
 
     try {
@@ -49,11 +35,19 @@ Page({
       })
       code = result.code || ''
     } catch (error) {
-      code = ''
+      this.setData({ loading: false })
+      wx.showToast({ title: '微信登录失败，请重试', icon: 'none' })
+      return
+    }
+
+    if (!code) {
+      this.setData({ loading: false })
+      wx.showToast({ title: '未获取到登录 code', icon: 'none' })
+      return
     }
 
     try {
-      const data = await api.login(openid, code)
+      const data = await api.login(code)
       if (!data || !data.token || !data.user) {
         throw new Error('登录返回数据不完整')
       }

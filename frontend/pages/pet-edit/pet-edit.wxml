@@ -3,7 +3,7 @@
     <image
       wx:if="{{form.avatar}}"
       class="avatar"
-      src="{{form.avatar}}"
+      src="{{avatarUrl}}"
       mode="aspectFill"
       bindtap="previewAvatar"
     ></image>

@@ -22,4 +22,11 @@ public class Result<T> {
         result.setMessage(message);
         return result;
     }
+
+    public static <T> Result<T> unauthorized(String message) {
+        Result<T> result = new Result<>();
+        result.setCode(401);
+        result.setMessage(message);
+        return result;
+    }
 }
