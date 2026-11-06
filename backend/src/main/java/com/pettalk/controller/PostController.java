@@ -4,11 +4,15 @@ import com.pettalk.common.PageResult;
 import com.pettalk.common.Result;
 import com.pettalk.dto.FeedItemVO;
 import com.pettalk.dto.PostCreateRequest;
+import com.pettalk.dto.PostUpdateRequest;
 import com.pettalk.service.PostService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,8 +30,10 @@ public class PostController {
     }
 
     @PostMapping
-    public Result<Map<String, Long>> publish(@RequestBody PostCreateRequest request) {
-        Long id = postService.publish(request);
+    public Result<Map<String, Long>> publish(
+            @RequestBody PostCreateRequest request,
+            @RequestAttribute("currentUserId") Long currentUserId) {
+        Long id = postService.publish(request, currentUserId);
         return Result.success(Map.of("id", id));
     }
 
@@ -44,5 +50,20 @@ public class PostController {
             @PathVariable Long postId,
             @RequestParam(required = false) Long userId) {
         return Result.success(postService.getDetail(postId, userId));
+    }
+
+    @PutMapping("/{postId}")
+    public Result<FeedItemVO> update(
+            @PathVariable Long postId,
+            @RequestBody PostUpdateRequest request,
+            @RequestAttribute("currentUserId") Long currentUserId) {
+        return Result.success(postService.updatePost(postId, request, currentUserId));
+    }
+
+    @DeleteMapping("/{postId}")
+    public Result<Map<String, Object>> delete(
+            @PathVariable Long postId,
+            @RequestAttribute("currentUserId") Long currentUserId) {
+        return Result.success(postService.deletePost(postId, currentUserId));
     }
 }

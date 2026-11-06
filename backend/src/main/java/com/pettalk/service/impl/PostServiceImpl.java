@@ -7,10 +7,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pettalk.common.PageResult;
 import com.pettalk.dto.FeedItemVO;
 import com.pettalk.dto.PostCreateRequest;
+import com.pettalk.dto.PostUpdateRequest;
+import com.pettalk.entity.Comment;
 import com.pettalk.entity.Follow;
 import com.pettalk.entity.Post;
 import com.pettalk.entity.PostLike;
 import com.pettalk.entity.User;
+import com.pettalk.mapper.CommentMapper;
 import com.pettalk.mapper.FollowMapper;
 import com.pettalk.mapper.PostLikeMapper;
 import com.pettalk.mapper.PostMapper;
@@ -32,13 +35,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     private static final long MAX_PAGE_SIZE = 50;
     private static final int MAX_IMAGE_COUNT = 9;
 
+    private final CommentMapper commentMapper;
     private final PostLikeMapper postLikeMapper;
     private final UserMapper userMapper;
     private final FollowMapper followMapper;
 
-    public PostServiceImpl(PostLikeMapper postLikeMapper,
+    public PostServiceImpl(CommentMapper commentMapper,
+                           PostLikeMapper postLikeMapper,
                            UserMapper userMapper,
                            FollowMapper followMapper) {
+        this.commentMapper = commentMapper;
         this.postLikeMapper = postLikeMapper;
         this.userMapper = userMapper;
         this.followMapper = followMapper;
@@ -46,29 +52,22 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
     @Override
     @Transactional
-    public Long publish(PostCreateRequest request) {
-        if (request.getUserId() == null) {
+    public Long publish(PostCreateRequest request, Long currentUserId) {
+        if (currentUserId == null) {
             throw new IllegalArgumentException("用户 ID 不能为空");
         }
-
-        String content = request.getContent() == null ? null : request.getContent().trim();
-        List<String> images = request.getImages() == null
-                ? List.of()
-                : request.getImages().stream()
-                .filter(image -> image != null && !image.isBlank())
-                .toList();
-
-        if (images.size() > MAX_IMAGE_COUNT) {
-            throw new IllegalArgumentException("最多只能上传9张图片");
+        if (request == null) {
+            throw new IllegalArgumentException("请求参数不能为空");
         }
-        if ((content == null || content.isEmpty()) && images.isEmpty()) {
-            throw new IllegalArgumentException("动态内容和图片不能同时为空");
-        }
+
+        String content = normalizeContent(request.getContent());
+        List<String> images = normalizeImages(request.getImages());
+        validateContentAndImages(content, images);
 
         Post post = new Post();
-        post.setUserId(request.getUserId());
+        post.setUserId(currentUserId);
         post.setPetId(request.getPetId());
-        post.setContent(content == null || content.isEmpty() ? null : content);
+        post.setContent(content);
         post.setImages(images);
         post.setLikeCount(0);
         post.setCommentCount(0);
@@ -135,6 +134,101 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         }
 
         return toFeedItemVO(post, author, liked, following);
+    }
+
+    @Override
+    @Transactional
+    public FeedItemVO updatePost(Long postId, PostUpdateRequest request, Long currentUserId) {
+        Post existing = requirePost(postId);
+        requireOwner(existing, currentUserId, "无权修改该动态");
+        if (request == null) {
+            throw new IllegalArgumentException("请求参数不能为空");
+        }
+
+        String content = request.getContent() == null
+                ? normalizeContent(existing.getContent())
+                : normalizeContent(request.getContent());
+        List<String> images = request.getImages() == null
+                ? normalizeImages(existing.getImages())
+                : normalizeImages(request.getImages());
+        validateContentAndImages(content, images);
+
+        Post update = new Post();
+        update.setId(postId);
+        update.setContent(content);
+        update.setImages(images);
+        if (request.getPetId() != null) {
+            if (request.getPetId() <= 0) {
+                throw new IllegalArgumentException("宠物 ID 不正确");
+            }
+            update.setPetId(request.getPetId());
+        }
+        updateById(update);
+        return getDetail(postId, currentUserId);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> deletePost(Long postId, Long currentUserId) {
+        Post existing = requirePost(postId);
+        requireOwner(existing, currentUserId, "无权删除该动态");
+
+        List<String> images = existing.getImages() == null
+                ? List.of()
+                : List.copyOf(existing.getImages());
+
+        commentMapper.delete(Wrappers.<Comment>lambdaQuery()
+                .eq(Comment::getPostId, postId));
+        postLikeMapper.delete(Wrappers.<PostLike>lambdaQuery()
+                .eq(PostLike::getPostId, postId));
+        removeById(postId);
+
+        return Map.of("id", postId, "images", images);
+    }
+
+    private Post requirePost(Long postId) {
+        if (postId == null || postId <= 0) {
+            throw new IllegalArgumentException("动态 ID 不能为空");
+        }
+        Post post = getById(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("动态不存在");
+        }
+        return post;
+    }
+
+    private void requireOwner(Post post, Long currentUserId, String message) {
+        if (currentUserId == null || !Objects.equals(post.getUserId(), currentUserId)) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private String normalizeContent(String content) {
+        if (content == null) {
+            return null;
+        }
+        String trimmed = content.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private List<String> normalizeImages(List<String> images) {
+        if (images == null) {
+            return List.of();
+        }
+        List<String> normalized = images.stream()
+                .filter(image -> image != null && !image.isBlank())
+                .map(String::trim)
+                .toList();
+        if (normalized.size() > MAX_IMAGE_COUNT) {
+            throw new IllegalArgumentException("最多只能上传9张图片");
+        }
+        return normalized;
+    }
+
+    private void validateContentAndImages(String content, List<String> images) {
+        if (content == null && images.isEmpty()) {
+            throw new IllegalArgumentException("动态内容和图片不能同时为空");
+        }
     }
 
     private Map<Long, User> loadAuthors(List<Post> posts) {

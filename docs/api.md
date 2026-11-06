@@ -212,7 +212,36 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 }
 ```
 
-当前版本暂不提供动态修改和删除接口。宠物档案的修改、删除接口不受影响。
+### PUT /post/{postId}
+
+编辑动态，需要 JWT，且只能编辑自己发布的动态。
+
+请求体字段均为可选；不传表示保持原值，传空字符串或空数组表示清空。
+
+```json
+{
+  "petId": 1,
+  "content": "今天带团子去公园",
+  "images": ["cloud://cloud1-d2g2g1di987d43491.xxxx/post/1.jpg"]
+}
+```
+
+编辑后文字和图片不能同时为空，最多 9 张图片。响应返回编辑后的动态详情，字段同 `GET /post/{postId}`。
+
+### DELETE /post/{postId}
+
+删除动态，需要 JWT，且只能删除自己发布的动态。评论、点赞在同一事务内一并删除。
+
+响应 `data`：
+
+```json
+{
+  "id": 1,
+  "images": ["cloud://cloud1-d2g2g1di987d43491.xxxx/post/1.jpg"]
+}
+```
+
+返回的 `images` 用于前端调用云函数清理 CloudBase 文件。
 
 ## 6. 评论
 
@@ -289,6 +318,44 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
   "following": true
 }
 ```
+
+### GET /user/{userId}/following
+
+分页查询指定用户的关注列表，按关注时间倒序，游客可访问。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `userId` | path | 是 | 用户 ID |
+| `currentUserId` | query | 否 | 当前用户 ID，用于返回 `following` 状态 |
+| `page` | query | 否 | 默认 1 |
+| `size` | query | 否 | 默认 10，最大 50 |
+
+响应 `data`：
+
+```json
+{
+  "list": [
+    {
+      "id": 2,
+      "nickname": "微信用户_2",
+      "avatar": null,
+      "bio": "喜欢小动物",
+      "following": true,
+      "createTime": "2026-10-20 16:00:00"
+    }
+  ],
+  "page": 1,
+  "size": 10,
+  "total": 1,
+  "hasMore": false
+}
+```
+
+### GET /user/{userId}/followers
+
+分页查询指定用户的粉丝列表，按关注时间倒序，游客可访问；参数和响应字段同关注列表。
+
+未传 `currentUserId` 时，列表中的 `following` 为 `null`。
 
 ## 9. 图片云存储
 
