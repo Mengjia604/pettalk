@@ -2,7 +2,6 @@ const BASE_URL = 'http://localhost:8080'
 
 function request(options) {
   return new Promise((resolve, reject) => {
-    // 从本地缓存读取 token 和 userId（1号登录后会存进去）
     const token = wx.getStorageSync('token') || ''
     const userId = wx.getStorageSync('userId') || 1
 
@@ -13,7 +12,7 @@ function request(options) {
       header: {
         'Content-Type': 'application/json',
         'Authorization': token ? ('Bearer ' + token) : '',
-        'X-User-Id': String(userId) // 临时测试用，1号做好JWT后后端会改
+        'X-User-Id': String(userId)
       },
       success(res) {
         if (res.statusCode !== 200) {
@@ -21,7 +20,6 @@ function request(options) {
           return reject(res)
         }
         const body = res.data
-        // 统一判断后端返回的 code 是否为 0
         if (!body || body.code !== 0) {
           wx.showToast({ title: (body && body.msg) || '请求失败', icon: 'none' })
           return reject(body)
@@ -37,10 +35,17 @@ function request(options) {
 }
 
 module.exports = {
+  request, // 直接暴露 request 供特殊方法使用
   get(url, data) {
     return request({ url, method: 'GET', data })
   },
   post(url, data) {
     return request({ url, method: 'POST', data })
+  },
+  put(url, data) {
+    return request({ url, method: 'PUT', data })
+  },
+  del(url, data) {
+    return request({ url, method: 'DELETE', data })
   }
 }

@@ -8,13 +8,11 @@
     
     <!-- 数据统计：关注、粉丝、动态数 (目前先用0占位，等3号接口) -->
     <view class="stats-row">
-      <view class="stat-item">
-        <text class="num">0</text>
-        <text class="label">关注</text>
+      <view class="stat-item" bindtap="goFollowList" data-type="following">
+        <text class="num">0</text><text class="label">关注</text>
       </view>
-      <view class="stat-item">
-        <text class="num">0</text>
-        <text class="label">粉丝</text>
+      <view class="stat-item" bindtap="goFollowList" data-type="followers">
+        <text class="num">0</text><text class="label">粉丝</text>
       </view>
       <view class="stat-item">
         <text class="num">{{list.length}}</text>

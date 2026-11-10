@@ -1,0 +1,19 @@
+<view class="tabs">
+  <view class="tab {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">关注</view>
+  <view class="tab {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">粉丝</view>
+</view>
+
+<view class="list-container">
+  <view wx:for="{{list}}" wx:key="id" class="user-item">
+    <view class="avatar">用</view> <!-- 待真实头像 -->
+    <view class="info">
+      <view class="name">{{item.nickname || '用户' + item.userId}}</view>
+      <view class="bio">{{item.bio || '这个人很懒，什么都没写'}}</view>
+    </view>
+  </view>
+
+  <!-- 加载中 / 空状态 / 没有更多 -->
+  <view wx:if="{{loading}}" class="status-text">加载中...</view>
+  <view wx:if="{{!loading && list.length === 0}}" class="status-text">暂无数据</view>
+  <view wx:if="{{!hasMore && list.length > 0}}" class="status-text">— 没有更多了 —</view>
+</view>

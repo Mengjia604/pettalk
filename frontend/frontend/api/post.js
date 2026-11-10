@@ -1,16 +1,28 @@
-const { get, post } = require('../utils/request')
+const { get, post, request } = require('../utils/request')
 
 module.exports = {
-  // 发布动态
   createPost(data) {
     return post('/post', data)
   },
-  // 获取首页列表
   getFeed(page, size) {
-    return get('/post/feed', { page: page || 1, size: size || 10 })
+    return get('/post/feed', { page, size })
   },
-  // 获取单条动态详情 (给3号用)
   getPostDetail(id) {
     return get('/post/' + id)
+  },
+  updatePost(id, data) {
+    // 直接使用原生的 request 传参，绝对不会出错
+    return request({
+      url: '/post/' + id,
+      method: 'PUT',
+      data: data
+    })
+  },
+  deletePost(id) {
+    // 直接使用原生的 request 传参
+    return request({
+      url: '/post/' + id,
+      method: 'DELETE'
+    })
   }
 }

@@ -11,10 +11,25 @@ page {
    padding: 24rpx; 
    margin-bottom: 16rpx;
    }
-.post-header { 
-  display: flex; 
-  align-items: center; 
-  margin-bottom: 16rpx; 
+
+.post-header { display: flex; align-items: center; margin-bottom: 16rpx; position: relative; }
+.action-btns {
+  position: absolute;
+  right: 0;
+  top: 10rpx;
+  display: flex;
+  gap: 16rpx;
+}
+.btn-edit, .btn-delete {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f0f0f0;
+  color: #666;
+}
+.btn-delete {
+  color: #ff4d4f;
+  background: #fff1f0;
 }
 
 .avatar { 
@@ -92,16 +107,18 @@ page {
   margin-top: 60rpx; 
 }
 
-.bottom-input-bar { 
-  position: fixed; 
-  bottom: 0; 
-  left: 0; 
-  right: 0; 
-  background: #fff; 
-  padding: 16rpx 24rpx; 
-  display: flex; 
-  align-items: center; 
-  border-top: 1rpx solid #eee; 
+.bottom-input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  /* 👇 核心适配代码：自动加上底部安全区的高度 */
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  border-top: 1rpx solid #eee;
 }
 
 .comment-input { 

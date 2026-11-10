@@ -62,5 +62,18 @@ Page({
   goDetail(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({ url: '/pages/detail/detail?id=' + id })
+  },
+
+  goFollowList(e) {
+    const type = e.currentTarget.dataset.type
+    wx.navigateTo({ url: `/pages/follow-list/follow-list?type=${type}` })
+  },
+
+  onPullDownRefresh() {
+    // 调用你现有的加载方法
+    this.loadMyPosts().finally(() => {
+      // 无论成功失败，停止下拉刷新的动画
+      wx.stopPullDownRefresh()
+    })
   }
 })

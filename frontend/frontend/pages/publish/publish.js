@@ -1,10 +1,44 @@
-const { createPost } = require('../../api/post')
+const { createPost, updatePost, getPostDetail } = require('../../api/post')
 
 Page({
   data: {
     content: '',
-    images: [],
-    submitting: false
+    images: [], 
+    submitting: false,
+    postId: null 
+  },
+
+  async onLoad(options) {
+    if (options.id) {
+      this.setData({ postId: options.id })
+      wx.setNavigationBarTitle({ title: '编辑动态' })
+      this.loadPostDetail(options.id)
+    }
+  },
+
+  async loadPostDetail(id) {
+    wx.showLoading({ title: '加载中' })
+    try {
+      const post = await getPostDetail(id)
+      this.setData({ content: post.content })
+      
+      // 保存原始 fileID 和 转换后的临时链接
+      this.originalImages = [...post.images]
+
+      if (post.images && post.images.length > 0) {
+        const cloudRes = await wx.cloud.callFunction({
+          name: 'getTempUrls',
+          data: { fileIDs: post.images }
+        })
+        const tempUrls = cloudRes.result || []
+        this.oldTempUrls = tempUrls // 👈 记录旧的 http 链接
+        this.setData({ images: tempUrls })
+      }
+    } catch (e) {
+      wx.showToast({ title: '获取详情失败', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   onContentInput(e) {
@@ -40,54 +74,63 @@ Page({
     }
 
     this.setData({ submitting: true })
-    wx.showLoading({ title: '发布中...' })
+    wx.showLoading({ title: '处理中...' })
 
     try {
-      // 1. 打印当前选中的图片本地路径
-      console.log("当前选中的本地图片:", this.data.images)
+      const finalFileIDs = []
+      const oldTempUrls = this.oldTempUrls || []
+      const originalImages = this.originalImages || []
 
-      const fileIDs = []
       for (let i = 0; i < this.data.images.length; i++) {
-        const filePath = this.data.images[i]
-        const cloudPath = `post/${Date.now()}-${i}-${Math.floor(Math.random() * 10000)}.jpg`
+        const img = this.data.images[i]
         
-        console.log(`开始上传第 ${i+1} 张图片...`)
-        const uploadRes = await wx.cloud.uploadFile({
-          cloudPath: cloudPath,
-          filePath: filePath
-        })
+        // 判断是否是旧图：在旧链接数组里找得到
+        const oldIndex = oldTempUrls.indexOf(img)
         
-        console.log("上传成功，获得 fileID:", uploadRes.fileID)
-        fileIDs.push(uploadRes.fileID)
+        if (oldIndex > -1) {
+          // 是旧图，拿回原来的 cloud:// 地址
+          finalFileIDs.push(originalImages[oldIndex])
+        } else {
+          // 是新图，执行上传
+          const cloudPath = `post/${Date.now()}-${i}-${Math.floor(Math.random() * 10000)}.jpg`
+          const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: img })
+          finalFileIDs.push(uploadRes.fileID)
+        }
+      }
+      
+      if (this.data.postId) {
+        await updatePost(this.data.postId, { content, images: finalFileIDs })
+        
+        // 找出被删掉的旧图并清理
+        if (originalImages.length > 0) {
+          const deletedFiles = originalImages.filter(id => !finalFileIDs.includes(id))
+          if (deletedFiles.length > 0) {
+            wx.cloud.callFunction({
+              name: 'deleteCloudFiles',
+              data: { fileIDs: deletedFiles }
+            })
+          }
+        }
+      } else {
+        await createPost({ content, images: finalFileIDs, petId: null })
       }
 
-      console.log("准备发送给后端的图片数组:", fileIDs)
-
-      // 2. 将文字和真实的 fileIDs 发送给后端
-      await createPost({
-        content,
-        images: fileIDs, // 这里一定要确保传的是 fileIDs
-        petId: null
-      })
-
-      wx.showToast({ title: '发布成功', icon: 'success' })
-      
-      // 延迟切回首页
-      setTimeout(() => {
-        wx.switchTab({ url: '/pages/index/index' })
-      }, 600)
+      wx.hideLoading()
+      wx.showToast({ title: '保存成功', icon: 'success' })
       
       const pages = getCurrentPages()
       const prev = pages[pages.length - 2]
-      if (prev && prev.refreshFeed) {
-        prev.refreshFeed()
+      if (prev) {
+        if (prev.fetchDetail) prev.fetchDetail(this.data.postId)
+        else if (prev.refreshFeed) prev.refreshFeed()
       }
       
       setTimeout(() => wx.navigateBack(), 600)
+
     } catch (e) {
       wx.hideLoading()
-      console.error("发布失败:", e)
-      wx.showToast({ title: '发布失败，看控制台', icon: 'none' })
+      console.error("保存失败:", e)
+      wx.showToast({ title: '保存失败', icon: 'none' })
     } finally {
       this.setData({ submitting: false })
     }

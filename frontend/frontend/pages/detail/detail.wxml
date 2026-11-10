@@ -7,6 +7,11 @@
         <view class="nickname">用户{{post.userId}}</view>
         <view class="time">{{post.createdAt}}</view>
       </view>
+
+      <view class="action-btns" wx:if="{{isOwner}}">
+        <text class="btn-edit" bindtap="goEdit">编辑</text>
+        <text class="btn-delete" bindtap="handleDelete">删除</text>
+      </view>
     </view>
     
     <view class="post-content" wx:if="{{post.content}}">{{post.content}}</view>
