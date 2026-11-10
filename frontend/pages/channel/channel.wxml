@@ -1,0 +1,103 @@
+<view class="page">
+  <view class="channel-hero hero-{{channel.code || 'other'}}">
+    <view class="hero-orb"></view>
+    <view class="hero-top">
+      <view>
+        <view class="hero-name">{{channel.name || '频道'}}</view>
+        <view class="hero-desc">{{channel.description || '按宠物大类浏览帖子'}}</view>
+      </view>
+      <image class="hero-paw" src="/images/paw.png" mode="aspectFit"></image>
+    </view>
+    <view class="hero-bottom">
+      <view class="hero-stats">
+        <view class="hero-stat"><text class="hero-number">{{channel.memberCount || 0}}</text><text class="hero-label">成员</text></view>
+        <view class="hero-divider"></view>
+        <view class="hero-stat"><text class="hero-number">{{channel.postCount || 0}}</text><text class="hero-label">全部帖子</text></view>
+        <view class="hero-divider"></view>
+        <view class="hero-stat"><text class="hero-number">{{channel.todayPostCount || 0}}</text><text class="hero-label">今日新增</text></view>
+      </view>
+      <button
+        wx:if="{{!channel.joined}}"
+        class="hero-join-btn"
+        loading="{{joinLoading}}"
+        disabled="{{joinLoading}}"
+        bindtap="toggleJoin"
+      >加入频道</button>
+      <button
+        wx:else
+        class="hero-joined-btn"
+        bindtap="toggleJoin"
+      >退出频道</button>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">频道帖子</text>
+    <text class="section-extra">共 {{total}} 条</text>
+  </view>
+
+  <view class="feed">
+    <view wx:for="{{list}}" wx:key="id" class="post-card">
+      <view class="post-header" data-user-id="{{item.userId}}" bindtap="goProfile">
+        <image
+          wx:if="{{item.avatar}}"
+          class="avatar"
+          src="{{item.avatar}}"
+          mode="aspectFill"
+        ></image>
+        <view wx:else class="avatar">{{item.userId}}</view>
+        <view class="user-info">
+          <view class="nickname">{{item.nickname || '用户' + item.userId}}</view>
+          <view class="time">{{item.createdAt || ''}}</view>
+        </view>
+      </view>
+
+      <view
+        wx:if="{{item.content}}"
+        class="post-content"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >{{item.content}}</view>
+
+      <view wx:if="{{item.images && item.images.length > 0}}" class="image-grid">
+        <image
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:key="*this"
+          src="{{img}}"
+          mode="aspectFill"
+          data-urls="{{item.images}}"
+          data-current="{{img}}"
+          bindtap="previewImage"
+          class="grid-image"
+        ></image>
+      </view>
+
+      <view class="post-footer">
+        <view
+          class="stat like {{item.liked ? 'active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="toggleLike"
+        >{{item.liked ? '已赞' : '点赞'}} {{item.likeCount || 0}}</view>
+        <view class="stat" data-id="{{item.id}}" bindtap="goDetail">评论 {{item.commentCount || 0}}</view>
+        <button
+          class="stat share-stat"
+          open-type="share"
+          data-post-id="{{item.id}}"
+          hover-class="none"
+        >转发</button>
+      </view>
+    </view>
+
+    <view wx:if="{{list.length === 0 && !loading}}" class="empty">
+      <text wx:if="{{channel.joined}}">这个频道还没有帖子，去发布第一条吧～</text>
+      <text wx:else>这个频道还没有帖子，加入后发布第一条吧～</text>
+      <view wx:if="{{channel.joined}}" class="empty-action" bindtap="goPublish">去发布</view>
+      <view wx:else class="empty-tip">加入频道后即可发帖</view>
+    </view>
+    <view wx:if="{{loading}}" class="loading">加载中...</view>
+    <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— 没有更多了 —</view>
+  </view>
+
+  <view wx:if="{{channel.joined}}" class="fab" bindtap="goPublish">+</view>
+</view>

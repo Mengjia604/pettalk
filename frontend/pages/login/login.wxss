@@ -1,1 +1,81 @@
-/* pages/login/login.wxss */
+page {
+  background: #fff8f1;
+}
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 0 48rpx;
+  background: linear-gradient(180deg, #fff7ed 0%, #fff 60%);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 80rpx;
+}
+
+.brand-image {
+  width: 220rpx;
+  height: 210rpx;
+}
+
+.brand-title {
+  margin-top: 24rpx;
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #2d2d2d;
+  letter-spacing: 4rpx;
+}
+
+.brand-subtitle {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.login-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-btn,
+.mock-btn {
+  width: 100%;
+  font-weight: 600;
+  border-radius: 44rpx;
+}
+
+.login-btn {
+  padding: 14rpx 0;
+  font-size: 32rpx;
+  color: #fff !important;
+  background: linear-gradient(135deg, #ff9a44, #fc6076) !important;
+  border: none;
+  box-shadow: 0 10rpx 24rpx rgba(252, 96, 118, 0.28);
+}
+
+.mock-btn {
+  padding: 12rpx 0;
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #f7780a !important;
+  background: #fff !important;
+  border: 2rpx solid #ffd7b0;
+}
+
+.login-btn::after,
+.mock-btn::after {
+  border: none;
+}
+
+.login-tip {
+  margin-top: 28rpx;
+  font-size: 24rpx;
+  color: #aaa;
+  text-align: center;
+}

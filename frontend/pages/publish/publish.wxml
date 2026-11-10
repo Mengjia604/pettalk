@@ -20,6 +20,26 @@
     </picker>
   </view>
 
+  <view class="pet-row">
+    <text class="pet-label">发布频道</text>
+    <picker
+      wx:if="{{channels.length > 0}}"
+      mode="selector"
+      range="{{channels}}"
+      range-key="name"
+      value="{{channelIndex}}"
+      bindchange="onChannelChange"
+    >
+      <view class="picker-value">{{selectedChannelName}}</view>
+    </picker>
+    <view wx:else class="picker-value picker-empty">暂未加入频道</view>
+  </view>
+
+  <view wx:if="{{channels.length === 0}}" class="channel-hint">
+    <text>加入频道后可发布到频道</text>
+    <text class="channel-hint-link" bindtap="goChannelTab">去加入 ›</text>
+  </view>
+
   <view class="image-grid">
     <block wx:for="{{images}}" wx:key="*this">
       <view class="image-item">
@@ -37,7 +57,7 @@
     </view>
   </view>
 
-  <view class="upload-tip">图片会先上传至微信云存储，再随动态发布。</view>
+  <view class="upload-tip">图片会先上传至微信云存储；已加入的频道才能在发布时选择。</view>
 
   <button
     class="submit-btn"
@@ -45,5 +65,8 @@
     loading="{{submitting}}"
     disabled="{{submitting}}"
     bindtap="submit"
+    hover-class="btn-hover"
   >{{submitting ? '发布中...' : '发布'}}</button>
+
+  <image class="cat-deco" src="/images/cat.png" mode="aspectFit"></image>
 </view>

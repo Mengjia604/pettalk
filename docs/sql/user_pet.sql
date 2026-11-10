@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   openid VARCHAR(64) NOT NULL,
   nickname VARCHAR(50),
   avatar VARCHAR(255),
+  cover VARCHAR(255),
   bio VARCHAR(200),
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_user_openid (openid)

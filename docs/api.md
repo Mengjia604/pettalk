@@ -81,6 +81,7 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
     "id": 1,
     "nickname": "微信用户_test",
     "avatar": null,
+    "cover": null,
     "bio": "喜欢小动物",
     "createTime": "2026-10-20 16:00:00"
   },
@@ -100,6 +101,19 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 ```
 
 未传 `currentUserId` 时，`following` 为 `null`；查看自己主页时也为 `false`。
+
+### PUT /user/profile
+
+更新当前登录用户的主页资料，需要 JWT。
+
+| 字段 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `nickname` | string | 是 | 名字，最多 50 个字符 |
+| `bio` | string | 否 | 简介，最多 200 个字符；不传则不修改 |
+| `avatar` | string | 否 | 头像 CloudBase `fileID` 或图片地址；传空字符串清空，不传则不修改 |
+| `cover` | string | 否 | 背景图 CloudBase `fileID` 或图片地址；传空字符串清空，不传则不修改 |
+
+响应 `data` 为更新后的 `UserSummaryVO`。
 
 ## 4. 宠物档案
 
@@ -139,12 +153,13 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 
 ### POST /post
 
-发布动态。文字和图片不能同时为空，最多上传 9 张图片。
+发布动态。文字和图片不能同时为空，最多上传 9 张图片。传入 `channelId` 时，当前用户必须已加入该频道。
 
 ```json
 {
   "userId": 1,
   "petId": 1,
+  "channelId": 1,
   "content": "今天带团子去公园",
   "images": ["cloud://cloud1-d2g2g1di987d43491.xxxx/post/1.jpg"]
 }
@@ -162,13 +177,14 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 
 ### GET /post/feed
 
-首页信息流，按发布时间倒序分页。
+首页信息流，按发布时间倒序分页。传入 `keyword` 时按动态正文模糊匹配。
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | `page` | query | 否 | 默认 1 |
 | `size` | query | 否 | 默认 10，最大 50 |
 | `currentUserId` | query | 否 | 当前用户 ID，用于返回点赞状态 |
+| `keyword` | query | 否 | 搜索关键词，最长 50 个字符 |
 
 响应 `data`：
 
@@ -182,7 +198,21 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 }
 ```
 
-`list` 中每条动态字段包括：`id`、`userId`、`petId`、`content`、`images`、`likeCount`、`commentCount`、`createdAt`、`nickname`、`avatar`、`liked`、`following`。
+`list` 中每条动态字段包括：`id`、`userId`、`petId`、`channelId`、`channelName`、`content`、`images`、`likeCount`、`commentCount`、`createdAt`、`nickname`、`avatar`、`liked`、`following`。
+
+### GET /post/hot
+
+热门帖子，按点赞数、评论数、发布时间倒序分页；传入 `keyword` 时按动态正文模糊匹配，传入 `channelId` 时只看指定频道。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `page` | query | 否 | 默认 1 |
+| `size` | query | 否 | 默认 10，最大 50 |
+| `currentUserId` | query | 否 | 当前用户 ID，用于返回点赞状态 |
+| `keyword` | query | 否 | 搜索关键词，最长 50 个字符 |
+| `channelId` | query | 否 | 频道 ID |
+
+响应字段同 `GET /post/feed`。
 
 ### GET /post/{postId}
 
@@ -200,6 +230,8 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
   "id": 1,
   "userId": 1,
   "petId": 1,
+  "channelId": 1,
+  "channelName": "猫咪",
   "content": "今天带团子去公园",
   "images": [],
   "likeCount": 2,
@@ -221,6 +253,7 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 ```json
 {
   "petId": 1,
+  "channelId": 1,
   "content": "今天带团子去公园",
   "images": ["cloud://cloud1-d2g2g1di987d43491.xxxx/post/1.jpg"]
 }
@@ -242,6 +275,81 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 ```
 
 返回的 `images` 用于前端调用云函数清理 CloudBase 文件。
+
+## 5.1 频道
+
+频道分为猫咪、狗狗、小宠、鸟类、水族、爬宠、其他和萌娃分享，不细分品种。
+
+### GET /channel/list
+
+查询全部频道，按 `sortOrder` 升序。游客可访问。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `currentUserId` | query | 否 | 当前用户 ID，用于返回加入状态 |
+
+响应 `data`：
+
+```json
+[
+  {
+    "id": 1,
+    "code": "cat",
+    "name": "猫咪",
+    "description": "猫咪日常、喂养、健康与救助交流",
+    "postCount": 12,
+    "todayPostCount": 2,
+    "memberCount": 36,
+    "joined": true
+  }
+]
+```
+
+### GET /channel/home
+
+首页顶部频道条数据。已加入频道时返回全部已加入频道；未加入任何频道时返回猫咪、狗狗推荐频道。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `currentUserId` | query | 否 | 当前用户 ID |
+
+响应字段同 `GET /channel/list`。
+
+### GET /channel/mine
+
+查询当前用户已加入的频道，发布页只展示这里返回的频道。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `currentUserId` | query | 是 | 当前用户 ID |
+
+### GET /channel/{channelId}
+
+查询频道详情，字段同频道列表项。游客可访问。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `channelId` | path | 是 | 频道 ID |
+| `currentUserId` | query | 否 | 当前用户 ID，用于返回加入状态 |
+
+### POST /channel/{channelId}/join
+
+加入频道，需要 JWT，重复调用保持幂等。响应为加入后的频道详情，`joined=true`。
+
+### DELETE /channel/{channelId}/join
+
+退出频道，需要 JWT，重复调用保持幂等。响应为退出后的频道详情，`joined=false`。
+
+### GET /channel/{channelId}/posts
+
+分页查询频道帖子，按发布时间倒序。参数和响应字段同 `GET /post/feed`。
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `channelId` | path | 是 | 频道 ID |
+| `page` | query | 否 | 默认 1 |
+| `size` | query | 否 | 默认 10，最大 50 |
+| `currentUserId` | query | 否 | 当前用户 ID，用于返回点赞状态 |
 
 ## 6. 评论
 
@@ -394,6 +502,14 @@ JWT 默认有效期 7 天，可通过 `JWT_EXPIRE_MINUTES` 调整。本地没有
 
 - 数据：`post`、`comments`、`hasMore`、`commentContent`、`submitting`、`isSelf`
 - 事件：`toggleLike`、`toggleFollow`、`goProfile`、`onCommentInput`、`submitComment`、`previewImage`
+- 转发：`onShareAppMessage` 返回帖子标题、`/pages/detail/detail?postId=...` 路径和首图，调用微信好友分享
+
+### pages/channel/channel.js
+
+- 数据：`channel`、`list`、`page`、`size`、`total`、`hasMore`、`loading`
+- 事件：`toggleJoin`、`toggleLike`、`goDetail`、`goProfile`、`previewImage`、`goPublish`
+- 未加入频道时展示「加入频道」；加入后展示发布入口
+- 进入频道时并行加载频道信息和频道帖子
 
 ### pages/profile/profile.js
 

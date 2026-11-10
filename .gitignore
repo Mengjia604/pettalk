@@ -23,5 +23,18 @@ _github_compare/
 # WeChat local private config
 frontend/project.private.config.json
 
+# Local archives / accidental files
+/backend.zip
+/frontend.zip
+/docs/sql.zip
+/$null
+
+# Local WeChat project configs at repo root
+/project.config.json
+/project.private.config.json
+
+# Reference materials
+/素材/
+
 # Course deliverables
 工程项目管理/

@@ -146,6 +146,7 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
         vo.setId(user.getId());
         vo.setNickname(user.getNickname());
         vo.setAvatar(user.getAvatar());
+        vo.setCover(user.getCover());
         vo.setBio(user.getBio());
         vo.setCreateTime(user.getCreateTime());
         if (currentUserId == null) {

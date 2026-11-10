@@ -15,6 +15,7 @@ public class Post {
     private Long id;
     private Long userId;
     private Long petId;
+    private Long channelId;
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String content;
 

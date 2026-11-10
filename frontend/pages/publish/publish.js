@@ -14,20 +14,34 @@ Page({
     petIndex: 0,
     selectedPetName: '不关联',
     petId: null,
+    channels: [],
+    channelIndex: 0,
+    selectedChannelName: '加载中...',
+    channelId: null,
     submitting: false,
     userId: null
   },
 
   onLoad() {
+    this.pendingChannelId = null
     this.setData({ userId: getCurrentUserId() })
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 })
+    }
     const userId = getCurrentUserId()
     this.setData({ userId })
+    const app = getApp()
+    if (app && app.globalData && app.globalData.publishChannelId) {
+      this.pendingChannelId = Number(app.globalData.publishChannelId)
+      app.globalData.publishChannelId = null
+    }
     if (userId) {
       this.loadPets(userId)
     }
+    this.loadChannels(userId)
   },
 
   async loadPets(userId) {
@@ -45,6 +59,39 @@ Page({
     }
   },
 
+  async loadChannels(userId) {
+    if (!userId) {
+      this.pendingChannelId = null
+      this.setData({
+        channels: [],
+        channelIndex: 0,
+        selectedChannelName: '暂未加入频道',
+        channelId: null
+      })
+      return
+    }
+    try {
+      const channels = await api.getMyChannels(userId)
+      const list = Array.isArray(channels) ? channels : []
+      const targetId = this.pendingChannelId || this.data.channelId
+      const selected = list.find((channel) => channel.id === targetId) || list[0] || null
+      this.pendingChannelId = null
+      this.setData({
+        channels: list,
+        channelIndex: selected ? list.indexOf(selected) : 0,
+        selectedChannelName: selected ? selected.name : '暂未加入频道',
+        channelId: selected ? selected.id : null
+      })
+    } catch (error) {
+      this.setData({
+        channels: [],
+        channelIndex: 0,
+        selectedChannelName: '暂未加入频道',
+        channelId: null
+      })
+    }
+  },
+
   onContentInput(event) {
     this.setData({ content: event.detail.value })
   },
@@ -57,6 +104,24 @@ Page({
       selectedPetName: pet ? pet.name : '不关联',
       petId: pet ? pet.id : null
     })
+  },
+
+  onChannelChange(event) {
+    const channelIndex = Number(event.detail.value)
+    const channel = this.data.channels[channelIndex]
+    this.setData({
+      channelIndex,
+      selectedChannelName: channel ? channel.name : '暂无频道',
+      channelId: channel ? channel.id : null
+    })
+  },
+
+  goChannelTab() {
+    const app = getApp()
+    if (app && app.globalData) {
+      app.globalData.homeTab = 'channel'
+    }
+    wx.switchTab({ url: '/pages/index/index' })
   },
 
   chooseImages() {
@@ -119,6 +184,7 @@ Page({
       await api.publishPost({
         userId,
         petId: this.data.petId,
+        channelId: this.data.channelId,
         content,
         images: fileIDs
       })
@@ -128,8 +194,15 @@ Page({
         images: [],
         petIndex: 0,
         selectedPetName: '不关联',
-        petId: null
+        petId: null,
+        channelIndex: 0,
+        selectedChannelName: this.data.channels[0] ? this.data.channels[0].name : '暂未加入频道',
+        channelId: this.data.channels[0] ? this.data.channels[0].id : null
       })
+      const app = getApp()
+      if (app && app.globalData) {
+        app.globalData.homeReset = true
+      }
       setTimeout(() => {
         wx.switchTab({ url: '/pages/index/index' })
       }, 600)

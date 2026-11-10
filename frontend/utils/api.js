@@ -14,10 +14,59 @@ function login(code) {
     auth: false
   })
 }
-function getFeed(page = 1, size = 10, currentUserId = null) {
+function getFeed(page = 1, size = 10, currentUserId = null, keyword = '') {
   return request({
-    url: '/post/feed',
-    data: { page, size, currentUserId }
+    url: `/post/feed${buildQuery({ page, size, currentUserId, keyword })}`
+  })
+}
+
+function getHotFeed(page = 1, size = 10, currentUserId = null, keyword = '', channelId = null) {
+  return request({
+    url: `/post/hot${buildQuery({ page, size, currentUserId, keyword, channelId })}`
+  })
+}
+
+function getChannels(currentUserId = null) {
+  return request({
+    url: `/channel/list${buildQuery({ currentUserId })}`
+  })
+}
+
+function getHomeChannels(currentUserId = null) {
+  return request({
+    url: `/channel/home${buildQuery({ currentUserId })}`
+  })
+}
+
+function getMyChannels(currentUserId = null) {
+  return request({
+    url: `/channel/mine${buildQuery({ currentUserId })}`
+  })
+}
+
+function getChannel(channelId, currentUserId = null) {
+  return request({
+    url: `/channel/${channelId}${buildQuery({ currentUserId })}`
+  })
+}
+
+function joinChannel(channelId) {
+  return request({
+    url: `/channel/${channelId}/join`,
+    method: 'POST'
+  })
+}
+
+function leaveChannel(channelId) {
+  return request({
+    url: `/channel/${channelId}/join`,
+    method: 'DELETE'
+  })
+}
+
+function getChannelPosts(channelId, page = 1, size = 10, currentUserId = null) {
+  return request({
+    url: `/channel/${channelId}/posts${buildQuery({ page, size, currentUserId })}`
   })
 }
 function getPost(postId, userId) {
@@ -30,6 +79,34 @@ function getUserProfile(userId, currentUserId, page = 1, size = 10) {
     url: `/user/${userId}/profile${buildQuery({ currentUserId, page, size })}`
   })
 }
+function getFollowingList(userId, params = {}) {
+  return request({
+    url: `/user/${userId}/following${buildQuery({
+      currentUserId: params.currentUserId,
+      page: params.page,
+      size: params.size
+    })}`
+  })
+}
+
+function getFollowersList(userId, params = {}) {
+  return request({
+    url: `/user/${userId}/followers${buildQuery({
+      currentUserId: params.currentUserId,
+      page: params.page,
+      size: params.size
+    })}`
+  })
+}
+
+function updateUserProfile(data) {
+  return request({
+    url: '/user/profile',
+    method: 'PUT',
+    data
+  })
+}
+
 function publishPost(data) {
   return request({
     url: '/post',
@@ -37,6 +114,21 @@ function publishPost(data) {
     data
   })
 }
+function editPost(postId, data) {
+  return request({
+    url: `/post/${postId}`,
+    method: 'PUT',
+    data
+  })
+}
+
+function deletePost(postId) {
+  return request({
+    url: `/post/${postId}`,
+    method: 'DELETE'
+  })
+}
+
 function getComments(postId, page = 1, size = 10) {
   return request({
     url: `/post/${postId}/comments`,
@@ -107,60 +199,25 @@ function deletePet(id) {
   })
 }
 
-// =========本周新增接口 开始=========
-/**
- * 编辑动态
- * @param {number} postId 动态ID
- * @param {Object} data {petId?, content?, images?}
- */
-function editPost(postId, data) {
-  return request({
-    url: `/post/${postId}`,
-    method: 'PUT',
-    data
-  })
-}
-
-/**
- * 删除动态
- * @param {number} postId 动态ID
- */
-function deletePost(postId) {
-  return request({
-    url: `/post/${postId}`,
-    method: 'DELETE'
-  })
-}
-
-/**
- * 获取关注列表
- * @param {number} userId 目标用户ID
- * @param {Object} params {currentUserId?, page?, size?}
- */
-function getFollowingList(userId, params = {}) {
-  return request({
-    url: `/user/${userId}/following${buildQuery(params)}`
-  })
-}
-
-/**
- * 获取粉丝列表
- * @param {number} userId 目标用户ID
- * @param {Object} params {currentUserId?, page?, size?}
- */
-function getFollowersList(userId, params = {}) {
-  return request({
-    url: `/user/${userId}/followers${buildQuery(params)}`
-  })
-}
-// =========本周新增接口 结束=========
-
 module.exports = {
   login,
   getFeed,
+  getHotFeed,
+  getChannels,
+  getHomeChannels,
+  getMyChannels,
+  getChannel,
+  getChannelPosts,
+  joinChannel,
+  leaveChannel,
   getPost,
   getUserProfile,
+  getFollowingList,
+  getFollowersList,
+  updateUserProfile,
   publishPost,
+  editPost,
+  deletePost,
   getComments,
   createComment,
   likePost,
@@ -171,9 +228,5 @@ module.exports = {
   getPet,
   addPet,
   updatePet,
-  deletePet,
-  editPost,
-  deletePost,
-  getFollowingList,
-  getFollowersList
+  deletePet
 }

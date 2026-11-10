@@ -13,7 +13,15 @@ public interface PostService extends IService<Post> {
 
     Long publish(PostCreateRequest request, Long currentUserId);
 
-    PageResult<FeedItemVO> getFeed(long page, long size, Long currentUserId);
+    PageResult<FeedItemVO> getFeed(long page, long size, Long currentUserId, String keyword);
+
+    PageResult<FeedItemVO> getHotFeed(long page,
+                                      long size,
+                                      Long currentUserId,
+                                      String keyword,
+                                      Long channelId);
+
+    PageResult<FeedItemVO> getChannelFeed(Long channelId, long page, long size, Long currentUserId);
 
     FeedItemVO getDetail(Long postId, Long currentUserId);
 

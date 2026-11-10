@@ -41,8 +41,19 @@ public class PostController {
     public Result<PageResult<FeedItemVO>> getFeed(
             @RequestParam(defaultValue = "1") long page,
             @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) Long currentUserId) {
-        return Result.success(postService.getFeed(page, size, currentUserId));
+            @RequestParam(required = false) Long currentUserId,
+            @RequestParam(required = false) String keyword) {
+        return Result.success(postService.getFeed(page, size, currentUserId, keyword));
+    }
+
+    @GetMapping("/hot")
+    public Result<PageResult<FeedItemVO>> getHotFeed(
+            @RequestParam(defaultValue = "1") long page,
+            @RequestParam(defaultValue = "10") long size,
+            @RequestParam(required = false) Long currentUserId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long channelId) {
+        return Result.success(postService.getHotFeed(page, size, currentUserId, keyword, channelId));
     }
 
     @GetMapping("/{postId}")

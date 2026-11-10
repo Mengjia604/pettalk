@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "频道",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "onReachBottomDistance": 100
+}

@@ -1,2 +1,194 @@
-<!--pages/profile/profile.wxml-->
-<text>pages/profile/profile.wxml</text>
+<view wx:if="{{needLogin}}" class="state-page">
+  <image class="state-cat" src="/images/cat.png" mode="aspectFit"></image>
+  <view class="state-title">登录后查看个人主页</view>
+  <view class="state-desc">登录后可以管理宠物档案、查看关注和粉丝。</view>
+  <button class="state-btn" bindtap="goLogin">微信一键登录</button>
+</view>
+
+<view wx:elif="{{loadError && !profile}}" class="state-page">
+  <view class="state-icon">!</view>
+  <view class="state-title">资料加载失败</view>
+  <view class="state-desc">{{loadError}}</view>
+  <button class="state-btn" bindtap="retryLoad">重新加载</button>
+</view>
+
+<view wx:elif="{{initialLoading && !profile}}" class="state-page">
+  <view class="state-title">加载中...</view>
+</view>
+
+<view wx:elif="{{profile}}" class="profile-page">
+  <view class="cover-wrap" style="padding-top: {{statusBarHeight}}px">
+    <image
+      wx:if="{{coverUrl}}"
+      class="cover-image"
+      src="{{coverUrl}}"
+      mode="aspectFill"
+    ></image>
+    <view wx:else class="cover-fallback">
+      <view class="cover-blob blob-one"></view>
+      <view class="cover-blob blob-two"></view>
+      <image class="cover-paw paw-one" src="/images/paw.png" mode="aspectFit"></image>
+      <image class="cover-paw paw-two" src="/images/paw.png" mode="aspectFit"></image>
+    </view>
+    <view class="cover-mask"></view>
+    <view class="nav-bar">
+      <text class="nav-title">{{navTitle}}</text>
+    </view>
+  </view>
+
+  <view class="info-card">
+    <view class="profile-row">
+      <view class="avatar-wrap">
+        <image
+          wx:if="{{avatarUrl}}"
+          class="avatar"
+          src="{{avatarUrl}}"
+          mode="aspectFill"
+        ></image>
+        <view wx:else class="avatar avatar-text">{{avatarText}}</view>
+      </view>
+      <view class="identity">
+        <view class="nickname">{{profile.user.nickname || '宠物用户'}}</view>
+        <view class="bio">{{profile.user.bio || '这个主人还没有写简介~'}}</view>
+      </view>
+    </view>
+
+    <view class="stats-row">
+      <view class="stats">
+        <view class="stat" data-type="following" bindtap="goFollowList">
+          <text class="stat-num">{{profile.followingCount || 0}}</text>
+          <text class="stat-label">关注</text>
+        </view>
+        <view class="stat" data-type="followers" bindtap="goFollowList">
+          <text class="stat-num">{{profile.followerCount || 0}}</text>
+          <text class="stat-label">粉丝</text>
+        </view>
+        <view class="stat">
+          <text class="stat-num">{{profile.postCount || 0}}</text>
+          <text class="stat-label">动态</text>
+        </view>
+      </view>
+      <view wx:if="{{isSelf}}" class="edit-btn" bindtap="goEditProfile">编辑主页</view>
+      <view
+        wx:else
+        class="follow-btn {{profile.following ? 'followed' : ''}}"
+        bindtap="toggleFollow"
+      >{{profile.following ? '已关注' : '关注'}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{isSelf || pets.length > 0}}" class="section">
+    <view class="section-head">
+      <text class="section-title">宠物档案</text>
+      <text wx:if="{{isSelf}}" class="section-link" bindtap="goPetArchive">管理 ›</text>
+      <text wx:else class="section-meta">共 {{pets.length}} 只</text>
+    </view>
+
+    <scroll-view wx:if="{{pets.length > 0}}" class="hscroll" scroll-x enhanced="{{true}}" show-scrollbar="{{false}}">
+      <view class="hscroll-inner">
+        <view
+          wx:for="{{pets}}"
+          wx:key="id"
+          class="pet-card"
+          data-id="{{item.id}}"
+          bindtap="goPetEdit"
+        >
+          <image
+            wx:if="{{item.avatarUrl}}"
+            class="pet-avatar"
+            src="{{item.avatarUrl}}"
+            mode="aspectFill"
+          ></image>
+          <view wx:else class="pet-avatar pet-avatar-empty">{{item.avatarText}}</view>
+          <view class="pet-info">
+            <text class="pet-name">{{item.name}}</text>
+            <text class="pet-breed">{{item.breed || '品种未填写'}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view wx:elif="{{isSelf}}" class="empty-inline" bindtap="goPetArchive">
+      <text>还没有宠物档案，去添加 ›</text>
+    </view>
+  </view>
+
+  <view wx:if="{{isSelf || channels.length > 0}}" class="section">
+    <view class="section-head">
+      <text class="section-title">加入的频道</text>
+      <text wx:if="{{channels.length > 0}}" class="section-meta">共 {{channels.length}} 个</text>
+      <text wx:else class="section-link" bindtap="goChannelSquare">去逛逛 ›</text>
+    </view>
+
+    <scroll-view wx:if="{{channels.length > 0}}" class="hscroll" scroll-x enhanced="{{true}}" show-scrollbar="{{false}}">
+      <view class="hscroll-inner">
+        <view
+          wx:for="{{channels}}"
+          wx:key="id"
+          class="channel-card"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+          bindtap="goChannel"
+        >
+          <view class="channel-icon">
+            <image class="channel-paw" src="/images/paw.png" mode="aspectFit"></image>
+          </view>
+          <view class="channel-info">
+            <text class="channel-name">{{item.name}}</text>
+            <text class="channel-meta">{{item.memberCount || 0}} 成员</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view wx:else class="empty-inline" bindtap="goChannelSquare">
+      <text>还没有加入频道，去逛逛 ›</text>
+    </view>
+  </view>
+
+  <view class="feed-section">
+    <view class="feed-tabs">
+      <view class="feed-tab active">{{isSelf ? '我的动态' : 'TA的动态'}}</view>
+    </view>
+
+    <view class="feed-list">
+      <view
+        wx:for="{{posts}}"
+        wx:key="id"
+        class="post-card"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >
+        <view wx:if="{{item.content}}" class="post-content">{{item.content}}</view>
+
+        <view wx:if="{{item.images && item.images.length > 0}}" class="image-grid">
+          <image
+            wx:for="{{item.images}}"
+            wx:for-item="img"
+            wx:key="*this"
+            src="{{img}}"
+            mode="aspectFill"
+            data-url="{{img}}"
+            data-urls="{{item.images}}"
+            catchtap="previewImage"
+            class="grid-image"
+          ></image>
+        </view>
+
+        <view class="post-footer">
+          <text class="post-time">{{item.createdAt}}</text>
+          <view class="post-stats">
+            <text>点赞 {{item.likeCount || 0}}</text>
+            <text>评论 {{item.commentCount || 0}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{posts.length === 0 && !loading}}" class="feed-empty">
+        {{isSelf ? '你还没有发布过动态哦～' : 'TA还没有发布过动态'}}
+      </view>
+      <view wx:if="{{loading}}" class="feed-loading">加载中...</view>
+      <view wx:if="{{!hasMore && posts.length > 0}}" class="feed-no-more">— 没有更多了 —</view>
+    </view>
+  </view>
+</view>

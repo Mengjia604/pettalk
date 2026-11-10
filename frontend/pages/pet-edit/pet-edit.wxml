@@ -22,15 +22,10 @@
     />
   </view>
 
-  <view class="form-item">
+  <view class="form-item" bindtap="chooseBreed">
     <text class="label">品种</text>
-    <input
-      class="input"
-      value="{{form.breed}}"
-      placeholder="请输入宠物品种"
-      maxlength="50"
-      bindinput="onBreedInput"
-    />
+    <text class="picker-value {{form.breed ? '' : 'placeholder'}}">{{form.breed || '请选择品种'}}</text>
+    <text class="form-arrow">›</text>
   </view>
 
   <picker mode="date" value="{{form.birthday}}" end="{{today}}" bindchange="onBirthdayChange">

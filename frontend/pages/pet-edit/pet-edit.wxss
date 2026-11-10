@@ -53,7 +53,21 @@
 
 .picker-value {
   flex: 1;
+  overflow: hidden;
   color: #333;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: #999;
+}
+
+.form-arrow {
+  margin-left: 12rpx;
+  font-size: 36rpx;
+  line-height: 1;
+  color: #c4cad1;
 }
 
 .save-button {

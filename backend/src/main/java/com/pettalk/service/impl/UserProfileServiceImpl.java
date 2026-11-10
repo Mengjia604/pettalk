@@ -1,9 +1,11 @@
 package com.pettalk.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pettalk.dto.UserProfileVO;
+import com.pettalk.dto.UserProfileUpdateRequest;
 import com.pettalk.dto.UserSummaryVO;
 import com.pettalk.entity.Follow;
 import com.pettalk.entity.Pet;
@@ -15,6 +17,7 @@ import com.pettalk.mapper.PostMapper;
 import com.pettalk.mapper.UserMapper;
 import com.pettalk.service.UserProfileService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -55,12 +58,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         long current = Math.max(page, 1);
         long pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
 
-        UserSummaryVO summary = new UserSummaryVO();
-        summary.setId(user.getId());
-        summary.setNickname(user.getNickname());
-        summary.setAvatar(user.getAvatar());
-        summary.setBio(user.getBio());
-        summary.setCreateTime(user.getCreateTime());
+        UserSummaryVO summary = toSummary(user);
 
         List<Pet> pets = petMapper.selectList(Wrappers.<Pet>lambdaQuery()
                 .eq(Pet::getUserId, userId)
@@ -97,5 +95,66 @@ public class UserProfileServiceImpl implements UserProfileService {
         result.setFollowing(following);
         result.setPosts(posts);
         return result;
+    }
+
+    @Override
+    @Transactional
+    public UserSummaryVO updateProfile(Long userId, UserProfileUpdateRequest request) {
+        if (userId == null || userId <= 0) {
+            throw new IllegalArgumentException("用户 ID 不能为空");
+        }
+        if (request == null) {
+            throw new IllegalArgumentException("资料不能为空");
+        }
+        User existing = userMapper.selectById(userId);
+        if (existing == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+
+        String nickname = request.getNickname() == null ? "" : request.getNickname().trim();
+        if (nickname.isEmpty()) {
+            throw new IllegalArgumentException("名字不能为空");
+        }
+        if (nickname.length() > 50) {
+            throw new IllegalArgumentException("名字不能超过 50 个字符");
+        }
+
+        LambdaUpdateWrapper<User> update = Wrappers.<User>lambdaUpdate()
+                .eq(User::getId, userId)
+                .set(User::getNickname, nickname);
+        if (request.getBio() != null) {
+            String bio = request.getBio().trim();
+            if (bio.length() > 200) {
+                throw new IllegalArgumentException("简介不能超过 200 个字符");
+            }
+            update.set(User::getBio, bio);
+        }
+        if (request.getAvatar() != null) {
+            update.set(User::getAvatar, normalizeNullable(request.getAvatar()));
+        }
+        if (request.getCover() != null) {
+            update.set(User::getCover, normalizeNullable(request.getCover()));
+        }
+        userMapper.update(null, update);
+        return toSummary(userMapper.selectById(userId));
+    }
+
+    private UserSummaryVO toSummary(User user) {
+        UserSummaryVO summary = new UserSummaryVO();
+        summary.setId(user.getId());
+        summary.setNickname(user.getNickname());
+        summary.setAvatar(user.getAvatar());
+        summary.setCover(user.getCover());
+        summary.setBio(user.getBio());
+        summary.setCreateTime(user.getCreateTime());
+        return summary;
+    }
+
+    private String normalizeNullable(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

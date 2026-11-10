@@ -1,0 +1,55 @@
+<view class="page">
+  <view class="tabs">
+    <view
+      class="tab {{currentTab === 0 ? 'active' : ''}}"
+      data-index="0"
+      bindtap="switchTab"
+    >关注</view>
+    <view
+      class="tab {{currentTab === 1 ? 'active' : ''}}"
+      data-index="1"
+      bindtap="switchTab"
+    >粉丝</view>
+  </view>
+
+  <view wx:if="{{loading && list.length === 0}}" class="state-text">加载中...</view>
+
+  <view wx:elif="{{!loading && list.length === 0}}" class="state-box">
+    <image class="state-cat" src="/images/cat.png" mode="aspectFit"></image>
+    <view class="state-title">{{currentTab === 0 ? '还没有关注任何人' : '还没有粉丝'}}</view>
+    <view class="state-desc">{{currentTab === 0 ? '去首页发现感兴趣的宠物主人吧' : '分享更多动态，认识新的朋友'}}</view>
+  </view>
+
+  <view wx:else class="user-list">
+    <view
+      class="user-card"
+      wx:for="{{list}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goUser"
+    >
+      <image
+        wx:if="{{item.avatarUrl}}"
+        class="avatar avatar-image"
+        src="{{item.avatarUrl}}"
+        mode="aspectFill"
+      ></image>
+      <view wx:else class="avatar avatar-text">{{item.avatarText}}</view>
+
+      <view class="user-info">
+        <view class="nickname">{{item.nickname || '宠物用户'}}</view>
+        <view class="bio">{{item.bio || '这个主人还没有写简介~'}}</view>
+      </view>
+
+      <view
+        wx:if="{{currentUserId && item.id !== currentUserId}}"
+        class="follow-btn {{item.following ? 'followed' : ''}}"
+        data-index="{{index}}"
+        catchtap="toggleFollow"
+      >{{item.following ? '已关注' : '关注'}}</view>
+    </view>
+
+    <view wx:if="{{loading}}" class="status-text">加载中...</view>
+    <view wx:elif="{{!hasMore && list.length > 0}}" class="status-text">— 没有更多了 —</view>
+  </view>
+</view>

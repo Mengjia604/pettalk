@@ -102,8 +102,15 @@ Page({
     this.setData({ 'form.name': event.detail.value })
   },
 
-  onBreedInput(event) {
-    this.setData({ 'form.breed': event.detail.value })
+  chooseBreed() {
+    wx.navigateTo({
+      url: `/pages/breed-picker/breed-picker?current=${encodeURIComponent(this.data.form.breed || '')}`,
+      events: {
+        selectBreed: (breed) => {
+          this.setData({ 'form.breed': breed })
+        }
+      }
+    })
   },
 
   onBirthdayChange(event) {

@@ -1,4 +1,13 @@
-// app.js
+const DEFAULT_API_BASE_URL = 'http://127.0.0.1:8080'
+
+function resolveApiBaseUrl() {
+  try {
+    return wx.getStorageSync('apiBaseUrl') || DEFAULT_API_BASE_URL
+  } catch (error) {
+    return DEFAULT_API_BASE_URL
+  }
+}
+
 App({
   onLaunch() {
     if (!wx.cloud) {
@@ -13,6 +22,9 @@ App({
   },
 
   globalData: {
-    apiBaseUrl: 'http://127.0.0.1:8080'
+    apiBaseUrl: resolveApiBaseUrl(),
+    homeReset: false,
+    homeTab: '',
+    publishChannelId: null
   }
 })

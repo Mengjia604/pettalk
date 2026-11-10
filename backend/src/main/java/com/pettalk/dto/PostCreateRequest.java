@@ -8,6 +8,7 @@ import java.util.List;
 public class PostCreateRequest {
     private Long userId;
     private Long petId;
+    private Long channelId;
     private String content;
     private List<String> images;
 }

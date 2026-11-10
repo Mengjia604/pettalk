@@ -9,6 +9,7 @@ public class UserSummaryVO {
     private Long id;
     private String nickname;
     private String avatar;
+    private String cover;
     private String bio;
     private Boolean following;
     private LocalDateTime createTime;

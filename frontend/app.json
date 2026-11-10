@@ -3,11 +3,17 @@
   "pages": [
     "pages/index/index",
     "pages/detail/detail",
+    "pages/post-edit/post-edit",
+    "pages/follow-list/follow-list",
     "pages/login/login",
     "pages/publish/publish",
     "pages/profile/profile",
+    "pages/profile-edit/profile-edit",
     "pages/pet-edit/pet-edit",
-    "pages/post-detail/post-detail"
+    "pages/pet-list/pet-list",
+    "pages/breed-picker/breed-picker",
+    "pages/post-detail/post-detail",
+    "pages/channel/channel"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -19,6 +25,11 @@
     "onReachBottomDistance": 50
   },
   "tabBar": {
+    "custom": true,
+    "color": "#A7ADB5",
+    "selectedColor": "#111111",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
     "list":[
       {
         "pagePath":"pages/index/index",

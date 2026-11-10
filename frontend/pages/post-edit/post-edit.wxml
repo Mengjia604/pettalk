@@ -1,0 +1,52 @@
+<view class="container">
+  <view class="edit-note">只能修改动态内容和图片</view>
+
+  <textarea
+    class="content-input"
+    placeholder="分享你和宠物的日常..."
+    maxlength="1000"
+    value="{{content}}"
+    bindinput="onContentInput"
+  ></textarea>
+
+  <view wx:if="{{pets.length > 0}}" class="pet-row">
+    <text class="pet-label">关联宠物</text>
+    <picker
+      mode="selector"
+      range="{{pets}}"
+      range-key="name"
+      value="{{petIndex}}"
+      bindchange="onPetChange"
+    >
+      <view class="picker-value">{{selectedPetName}}</view>
+    </picker>
+  </view>
+
+  <view class="image-grid">
+    <block wx:for="{{images}}" wx:key="*this">
+      <view class="image-item">
+        <image
+          src="{{item}}"
+          mode="aspectFill"
+          data-url="{{item}}"
+          bindtap="previewImage"
+        ></image>
+        <view class="remove-btn" data-index="{{index}}" bindtap="removeImage">×</view>
+      </view>
+    </block>
+    <view wx:if="{{images.length < 9}}" class="add-btn" bindtap="chooseImages">
+      <text class="plus">+</text>
+    </view>
+  </view>
+
+  <view class="upload-tip">保留的原图不会重复上传，删除的图片会同步清理云存储。</view>
+
+  <button
+    class="submit-btn"
+    type="primary"
+    loading="{{submitting}}"
+    disabled="{{submitting || loading}}"
+    bindtap="submit"
+    hover-class="btn-hover"
+  >{{submitting ? '保存中...' : '保存修改'}}</button>
+</view>

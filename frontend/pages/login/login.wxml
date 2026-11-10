@@ -1,2 +1,24 @@
-<!--pages/login/login.wxml-->
-<text>pages/login/login.wxml</text>
+<view class="login-page">
+  <view class="brand">
+    <image class="brand-image" src="/images/cat.png" mode="aspectFit"></image>
+    <view class="brand-title">PetTalk</view>
+    <view class="brand-subtitle">记录你和宠物的每一天</view>
+  </view>
+
+  <view class="login-panel">
+    <button
+      class="login-btn"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+      bindtap="handleLogin"
+    >{{loading ? '登录中...' : '微信一键登录'}}</button>
+    <button
+      wx:if="{{isDev}}"
+      class="mock-btn"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+      bindtap="handleMockLogin"
+    >本地测试登录</button>
+    <view class="login-tip">登录后即可发布动态、管理宠物档案</view>
+  </view>
+</view>

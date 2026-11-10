@@ -10,6 +10,8 @@ public class FeedItemVO {
     private Long id;
     private Long userId;
     private Long petId;
+    private Long channelId;
+    private String channelName;
     private String content;
     private List<String> images;
     private Integer likeCount;

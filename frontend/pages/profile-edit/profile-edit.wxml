@@ -1,0 +1,75 @@
+<view class="edit-page">
+  <view wx:if="{{loading}}" class="page-loading">加载中...</view>
+
+  <view wx:elif="{{loadError}}" class="page-error">
+    <view class="error-title">资料加载失败</view>
+    <view class="error-desc">{{loadError}}</view>
+    <view class="retry-btn" bindtap="retryLoad">重新加载</view>
+  </view>
+
+  <block wx:else>
+    <view class="cover-wrap">
+      <image
+        wx:if="{{coverUrl}}"
+        class="cover-image"
+        src="{{coverUrl}}"
+        mode="aspectFill"
+      ></image>
+      <view wx:else class="cover-fallback">
+        <view class="cover-blob blob-one"></view>
+        <view class="cover-blob blob-two"></view>
+        <image class="cover-paw" src="/images/paw.png" mode="aspectFit"></image>
+      </view>
+      <view class="change-cover" bindtap="chooseCover">更换背景</view>
+    </view>
+
+    <view class="form-card">
+      <view class="avatar-block">
+        <view class="avatar-wrap" bindtap="chooseAvatar">
+          <image
+            wx:if="{{avatarUrl}}"
+            class="avatar"
+            src="{{avatarUrl}}"
+            mode="aspectFill"
+          ></image>
+          <view wx:else class="avatar avatar-text">{{avatarText}}</view>
+          <view class="avatar-badge">+</view>
+        </view>
+        <text class="avatar-tip" bindtap="chooseAvatar">更换头像</text>
+      </view>
+
+      <view class="form-row">
+        <text class="form-label">名字</text>
+        <input
+          class="form-input"
+          value="{{nickname}}"
+          maxlength="50"
+          placeholder="请输入名字"
+          placeholder-class="placeholder"
+          bindinput="onNicknameInput"
+        />
+      </view>
+
+      <view class="form-row bio-row">
+        <text class="form-label">简介</text>
+        <view class="bio-field">
+          <textarea
+            class="bio-input"
+            value="{{bio}}"
+            maxlength="200"
+            placeholder="介绍一下自己和毛孩子吧"
+            placeholder-class="placeholder"
+            auto-height
+            bindinput="onBioInput"
+          ></textarea>
+          <text class="bio-count">{{bioCount}}/200</text>
+        </view>
+      </view>
+
+      <view class="save-btn {{saving ? 'disabled' : ''}}" bindtap="saveProfile">
+        {{saving ? '保存中...' : '保存'}}
+      </view>
+      <view class="save-tip">可修改头像、名字、简介和背景图</view>
+    </view>
+  </block>
+</view>

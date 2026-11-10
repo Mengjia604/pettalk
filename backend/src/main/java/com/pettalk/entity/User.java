@@ -9,6 +9,7 @@ public class User {
     private String openid;
     private String nickname;
     private String avatar;
+    private String cover;
     private String bio;
     private LocalDateTime createTime;
 }

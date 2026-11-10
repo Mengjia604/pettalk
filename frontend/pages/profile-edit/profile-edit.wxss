@@ -1,0 +1,266 @@
+page {
+  background: #ffffff;
+  color: #3a302d;
+}
+
+.edit-page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding-bottom: calc(70rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+}
+
+.page-loading {
+  padding: 120rpx 0;
+  font-size: 27rpx;
+  color: #a8968e;
+  text-align: center;
+}
+
+.page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 160rpx 60rpx;
+  text-align: center;
+}
+
+.error-title {
+  font-size: 31rpx;
+  font-weight: 700;
+}
+
+.error-desc {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #a8968e;
+}
+
+.retry-btn {
+  height: 68rpx;
+  padding: 0 40rpx;
+  margin-top: 30rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 68rpx;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff9a44, #fc6076);
+  border-radius: 34rpx;
+}
+
+.cover-wrap {
+  position: relative;
+  height: 360rpx;
+  overflow: hidden;
+}
+
+.cover-image,
+.cover-fallback {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cover-fallback {
+  overflow: hidden;
+  background: linear-gradient(160deg, #fff2e2 0%, #ffdcb9 62%, #ffd0aa 100%);
+}
+
+.cover-blob {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.blob-one {
+  top: -120rpx;
+  right: -100rpx;
+  width: 360rpx;
+  height: 360rpx;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.blob-two {
+  bottom: -170rpx;
+  left: -80rpx;
+  width: 360rpx;
+  height: 360rpx;
+  background: rgba(255, 233, 208, 0.92);
+}
+
+.cover-paw {
+  position: absolute;
+  top: 96rpx;
+  left: 76rpx;
+  width: 126rpx;
+  height: 122rpx;
+  opacity: 0.34;
+  transform: rotate(-12deg);
+}
+
+.change-cover {
+  position: absolute;
+  right: 30rpx;
+  bottom: 92rpx;
+  display: flex;
+  align-items: center;
+  height: 60rpx;
+  padding: 0 28rpx;
+  font-size: 23rpx;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff9a44, #fc6076);
+  border-radius: 32rpx;
+  box-shadow: 0 6rpx 18rpx rgba(252, 96, 118, 0.24);
+}
+
+.form-card {
+  position: relative;
+  z-index: 2;
+  padding: 0 40rpx 30rpx;
+  margin-top: -70rpx;
+  background: #ffffff;
+  border-radius: 40rpx 40rpx 0 0;
+}
+
+.avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-wrap {
+  position: relative;
+  margin-top: -92rpx;
+}
+
+.avatar {
+  display: block;
+  box-sizing: border-box;
+  width: 168rpx;
+  height: 168rpx;
+  border: 8rpx solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 8rpx 24rpx rgba(58, 48, 45, 0.12);
+}
+
+.avatar-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 58rpx;
+  font-weight: 700;
+  line-height: 152rpx;
+  background: linear-gradient(135deg, #ff9a44, #f7780a);
+}
+
+.avatar-badge {
+  position: absolute;
+  right: 0;
+  bottom: 4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46rpx;
+  height: 46rpx;
+  font-size: 30rpx;
+  line-height: 1;
+  color: #f7780a;
+  background: #ffffff;
+  border: 2rpx solid #ffe0c8;
+  border-radius: 50%;
+  box-shadow: 0 4rpx 12rpx rgba(58, 48, 45, 0.1);
+}
+
+.avatar-tip {
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  font-weight: 600;
+  color: #f7780a;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  min-height: 104rpx;
+  margin-top: 18rpx;
+  border-bottom: 1rpx solid #f3ece7;
+}
+
+.bio-row {
+  align-items: flex-start;
+  padding-top: 30rpx;
+}
+
+.form-label {
+  flex-shrink: 0;
+  width: 118rpx;
+  font-size: 25rpx;
+  color: #8c7b74;
+}
+
+.form-input {
+  flex: 1;
+  height: 104rpx;
+  font-size: 28rpx;
+  color: #3a302d;
+}
+
+.bio-field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: 10rpx;
+}
+
+.bio-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 132rpx;
+  padding: 0;
+  font-size: 27rpx;
+  line-height: 1.6;
+  color: #3a302d;
+}
+
+.bio-count {
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #b7a49c;
+  text-align: right;
+}
+
+.placeholder {
+  color: #c9b6ae;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  margin-top: 54rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff9a44, #fc6076);
+  border-radius: 44rpx;
+  box-shadow: 0 10rpx 24rpx rgba(252, 96, 118, 0.22);
+}
+
+.save-btn.disabled {
+  opacity: 0.6;
+}
+
+.save-tip {
+  margin-top: 22rpx;
+  font-size: 20rpx;
+  color: #b7a49c;
+  text-align: center;
+}

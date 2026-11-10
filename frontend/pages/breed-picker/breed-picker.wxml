@@ -1,0 +1,59 @@
+<view class="picker-page">
+  <view class="search-wrap">
+    <view class="search-bar">
+      <view class="search-icon"></view>
+      <input
+        class="search-input"
+        value="{{keyword}}"
+        placeholder="搜索品种，如：柯基"
+        confirm-type="search"
+        bindinput="onSearchInput"
+      />
+      <text wx:if="{{keyword}}" class="search-clear" bindtap="clearSearch">×</text>
+    </view>
+  </view>
+
+  <view class="columns">
+    <scroll-view class="category-scroll" scroll-y>
+      <view
+        wx:for="{{categories}}"
+        wx:key="*this"
+        class="category-item {{item === activeCategory && !searching ? 'active' : ''}}"
+        data-name="{{item}}"
+        bindtap="onCategoryTap"
+      >{{item}}</view>
+    </scroll-view>
+
+    <scroll-view class="breed-scroll" scroll-y scroll-into-view="{{scrollIntoView}}">
+      <view id="breed-top"></view>
+
+      <block wx:if="{{list.length > 0}}">
+        <view
+          wx:for="{{list}}"
+          wx:key="name"
+          id="breed-{{index}}"
+          class="breed-item {{item.name === currentBreed ? 'active' : ''}}"
+          data-name="{{item.name}}"
+          bindtap="selectBreed"
+        >
+          <text class="breed-name">{{item.name}}</text>
+          <text wx:if="{{searching}}" class="breed-category">{{item.category}}</text>
+          <text wx:if="{{item.name === currentBreed}}" class="breed-check">✓</text>
+        </view>
+      </block>
+
+      <view wx:else class="empty-result">
+        <view class="empty-icon"></view>
+        <view class="empty-title">没有找到「{{keyword}}」</view>
+        <view class="empty-desc">暂时没有收录这个品种</view>
+        <button class="empty-feedback" open-type="contact">客服反馈</button>
+        <view class="empty-tip">告诉我们，我们会尽快补充</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="picker-footer">
+    <text class="footer-hint">找不到想要的品种？</text>
+    <button class="footer-feedback" open-type="contact">客服反馈</button>
+  </view>
+</view>
